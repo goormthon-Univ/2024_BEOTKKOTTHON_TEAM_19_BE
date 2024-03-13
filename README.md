@@ -36,3 +36,12 @@ PR 탬플릿을 만들어두었으니, PR 을 올리시면 자동으로 탬플�
 
 ![image](https://github.com/choboss00/2024_BEOTKKOTTHON_TEAM_19_BE/assets/111727212/961f9784-7737-49c0-bd54-0c9a7d028ee6)
 
+## 네이밍 컨밴션
+
+변수명, 함수명 : camel case ( EX) camelCaseNamingConvention )
+
+클래스명 : pascal case ( EX) PascalCaseNamingConvention )
+
+DB 테이블 명 : snake case ( EX) snacke_case_naming_convention )
+
+상수 명 : scream snake case ( EX) SCREAM_SNAKE_CASE_EXAMPLE )
