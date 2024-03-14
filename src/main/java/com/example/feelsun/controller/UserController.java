@@ -5,6 +5,10 @@ import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
 import com.example.feelsun.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -26,12 +30,18 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "회원가입 성공")
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignUpRequest requestDTO) {
         userService.signup(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
     }
 
+    @Operation(summary = "로그인", description = "로그인을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserLoginResponse.class)))
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors, HttpServletResponse response) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
