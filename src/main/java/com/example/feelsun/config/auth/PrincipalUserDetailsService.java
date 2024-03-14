@@ -1,7 +1,7 @@
 package com.example.feelsun.config.auth;
 
-import com.example.shipgofunding.user.domain.User;
-import com.example.shipgofunding.user.repository.UserRepository;
+import com.example.feelsun.domain.User;
+import com.example.feelsun.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,11 +14,11 @@ import java.util.Optional;
 @Service
 public class PrincipalUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        Optional<User> optionalUser = userJpaRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             return null;

@@ -1,6 +1,6 @@
 package com.example.feelsun.config.auth;
 
-import com.example.shipgofunding.user.domain.User;
+import com.example.feelsun.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
