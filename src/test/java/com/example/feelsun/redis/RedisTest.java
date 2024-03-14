@@ -1,7 +1,6 @@
 package com.example.feelsun.redis;
 
 import com.example.feelsun.config.redis.RedisService;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
