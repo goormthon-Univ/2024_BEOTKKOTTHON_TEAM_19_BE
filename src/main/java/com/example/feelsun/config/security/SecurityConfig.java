@@ -55,7 +55,9 @@ public class SecurityConfig {
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource())) // CORS 설정
                 .formLogin(AbstractHttpConfigurer::disable) // form login 사용 X
                 .httpBasic(AbstractHttpConfigurer::disable) // http basic 사용 X
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll()) // 아직 설계한 API 가 없으니 모두 허용
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/test/**").authenticated() // jwt 인증 테스트
+                        .anyRequest().permitAll()) // 아직 설계한 API 가 없으니 모두 허용
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
