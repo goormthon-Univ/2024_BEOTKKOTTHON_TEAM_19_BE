@@ -37,4 +37,13 @@ public class UserRequest {
                     .build();
         }
     }
+
+    @Getter
+    @Setter
+    public static class UserLoginRequest {
+        @NotNull(message = "이메일은 필수 입력 값입니다.")
+        private String email;
+        @NotNull(message = "비밀번호는 필수 입력 값입니다.")
+        private String password;
+    }
 }
