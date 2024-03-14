@@ -30,14 +30,42 @@ public class JwtProvider {
 
     private Key secretKey;
 
-    // 만료시간 1hour
-    private final Long exp = 1000L * 60 * 60;
+    // 만료시간 1시간
+    private final Long accessExp = 1000L * 60 * 60;
+
+    // 만료시간 7일
+    private final Long refreshExp = 1000L * 60 * 60 * 24 * 7;
 
     private final PrincipalUserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init() {
         secretKey = Keys.hmacShaKeyFor(salt.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // 리프래쉬 토큰 생성
+    public String createRefreshToken(String identity) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(identity)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshExp))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // 리프래쉬 토큰 검증
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // 토큰 생성
@@ -50,7 +78,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + exp))
+                .setExpiration(new Date(now.getTime() + accessExp))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
