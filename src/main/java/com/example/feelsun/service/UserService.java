@@ -39,7 +39,7 @@ public class UserService {
             throw new Exception400(null, "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String token = tokenProvider.createToken(user.getEmail());
+        String token = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getEmail(), user.getNickname(), user.getProfileImage(), user.getSchool(), user.getMajor(), user.getGrade());
 

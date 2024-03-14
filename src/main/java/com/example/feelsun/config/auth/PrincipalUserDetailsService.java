@@ -19,14 +19,13 @@ public class PrincipalUserDetailsService implements UserDetailsService {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userJpaRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userJpaRepository.findById(Long.parseLong(id));
 
         if (optionalUser.isEmpty()) {
             return null;
         }
         User user = optionalUser.get();
-        log.info("user : " + user);
         return new PrincipalUserDetails(user);
 
     }
