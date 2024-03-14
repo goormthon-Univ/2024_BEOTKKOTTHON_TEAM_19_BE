@@ -36,10 +36,14 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors, HttpServletResponse response) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
 
-        // jwt 토큰 쿠키에 담기
-        String accessToken = JwtProvider.TOKEN_PREFIX + loginDTO.getToken();
+        String accessToken = JwtProvider.TOKEN_PREFIX + loginDTO.getAccessToken();
 
         response.setHeader(HttpHeaders.AUTHORIZATION, accessToken);
+
+        Cookie cookie = new Cookie("refresh-token", loginDTO.getRefreshToken());
+        cookie.setHttpOnly(true); // JS를 통한 접근 방지
+        cookie.setPath("/"); // 쿠키를 전송할 경로
+        response.addCookie(cookie);
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(loginDTO.getLoginResponseDTO()));
     }

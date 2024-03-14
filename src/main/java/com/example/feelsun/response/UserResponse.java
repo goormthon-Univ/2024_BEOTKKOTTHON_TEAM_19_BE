@@ -9,11 +9,13 @@ public class UserResponse {
     @Setter
     public static class UserLoginResponseWithToken {
         private UserLoginResponse loginResponseDTO;
-        private String token;
+        private String accessToken;
+        private String refreshToken;
 
-        public UserLoginResponseWithToken(UserLoginResponse loginResponseDTO, String token) {
+        public UserLoginResponseWithToken(UserLoginResponse loginResponseDTO, String accessToken, String refreshToken) {
             this.loginResponseDTO = loginResponseDTO;
-            this.token = token;
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
         }
     }
 

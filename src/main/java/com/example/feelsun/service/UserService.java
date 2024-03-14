@@ -3,6 +3,7 @@ package com.example.feelsun.service;
 import com.example.feelsun.config.errors.exception.Exception400;
 import com.example.feelsun.config.errors.exception.Exception404;
 import com.example.feelsun.config.jwt.JwtProvider;
+import com.example.feelsun.config.jwt.refreshToken.RefreshTokenService;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.domain.UserEnum;
 import com.example.feelsun.repository.UserJpaRepository;
@@ -21,6 +22,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserJpaRepository userJpaRepository;
     private final JwtProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public void signup(UserSignUpRequest requestDTO) {
@@ -39,10 +41,16 @@ public class UserService {
             throw new Exception400(null, "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String token = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+        String accessToken = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+
+        // 리프래쉬 토큰 생성
+        String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
+
+        // 리프래쉬 토큰을 Redis에 저장
+        refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
 
         UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getEmail(), user.getNickname(), user.getProfileImage(), user.getSchool(), user.getMajor(), user.getGrade());
 
-        return new UserLoginResponseWithToken(loginResponseDTO, token);
+        return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
 }
