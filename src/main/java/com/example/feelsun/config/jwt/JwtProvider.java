@@ -26,6 +26,8 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String salt;
 
+    public static final String TOKEN_PREFIX = "Bearer ";
+
     private Key secretKey;
 
     // 만료시간 1hour
@@ -39,9 +41,8 @@ public class JwtProvider {
     }
 
     // 토큰 생성
-    public String createToken(String identity, String role) {
+    public String createToken(String identity) {
         Claims claims = Jwts.claims().setSubject(identity);
-        claims.put("role", role);
         Date now = new Date();
 
         return Jwts.builder()
