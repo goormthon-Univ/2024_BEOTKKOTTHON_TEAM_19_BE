@@ -2,7 +2,7 @@ package com.example.feelsun.controller;
 
 import com.example.feelsun.config.errors.exception.Exception401;
 import com.example.feelsun.config.jwt.JwtProvider;
-import com.example.feelsun.config.jwt.refreshToken.RefreshTokenResponse.*;
+import com.example.feelsun.config.jwt.refreshToken.RefreshTokenResponse;
 import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.repository.UserJpaRepository;
@@ -34,7 +34,7 @@ public class AuthController {
     @Operation(summary = "토큰 재발급", description = "토큰 재발급을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = RefreshTokenResponseDTO.class)))
+                    schema = @Schema(implementation = RefreshTokenResponse.class)))
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody @Valid RefreshTokenRequest requestDTO, Errors errors) {
         String refreshToken = requestDTO.getRefreshToken();
@@ -54,7 +54,7 @@ public class AuthController {
 
         String newAccessToken = jwtProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
-        RefreshTokenResponseDTO refreshTokenResponseDTO = new RefreshTokenResponseDTO(newAccessToken);
+        RefreshTokenResponse refreshTokenResponseDTO = new RefreshTokenResponse(newAccessToken);
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(refreshTokenResponseDTO));
     }
