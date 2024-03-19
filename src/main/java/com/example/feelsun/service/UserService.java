@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -51,5 +53,13 @@ public class UserService {
         UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname());
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
+    }
+
+    public boolean checkUsername(UserCheckUsernameRequest requestDTO) {
+        return userJpaRepository.existsByUsername(requestDTO.getUsername());
+    }
+
+    public boolean checkNickname(UserCheckNicknameRequest requestDTO) {
+        return userJpaRepository.existsByNickname(requestDTO.getNickname());
     }
 }
