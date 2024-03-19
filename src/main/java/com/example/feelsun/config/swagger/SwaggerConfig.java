@@ -28,8 +28,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("필선 Project API")
-                .description("필선 프로젝트 API 명세서입니다.")
+                .title("원해빗 Project API")
+                .description("원해빗 프로젝트 API 명세서입니다.")
                 .version("1.0.0");
     }
 }
