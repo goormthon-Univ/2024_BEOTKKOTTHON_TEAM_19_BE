@@ -43,18 +43,8 @@ public class UserController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserLoginResponse.class)))
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
-
-        String accessToken = JwtProvider.TOKEN_PREFIX + loginDTO.getAccessToken();
-
-        response.setHeader(HttpHeaders.AUTHORIZATION, accessToken);
-
-        Cookie cookie = new Cookie("refresh-token", loginDTO.getRefreshToken());
-        cookie.setHttpOnly(true); // JS를 통한 접근 방지
-        cookie.setPath("/"); // 쿠키를 전송할 경로
-        response.addCookie(cookie);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(loginDTO.getLoginResponseDTO()));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(loginDTO));
     }
 }
