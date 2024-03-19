@@ -14,7 +14,7 @@ public class User {
     private Integer id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     private String password;
@@ -22,32 +22,16 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
-    private String profileImage;
-
-    @Column(nullable = false)
-    private String school;
-
-    @Column(nullable = false)
-    private String major;
-
-    @Column(nullable = false)
-    private String grade;
-
     @Enumerated(EnumType.STRING)
     private UserEnum role;
 
     @Builder
-    public User(String email, String password, String nickname, String school, String major, String grade, UserEnum role) {
-        this.email = email;
+    public User(String username, String password, String nickname, UserEnum role) {
+        this.username = username;
         this.password = password;
         this.nickname = nickname;
-        this.school = school;
-        this.major = major;
-        this.grade = grade;
         this.role = role;
     }
-
-    //TO-DO : 공부지수 등 게임적인 요소를 추가할 경우, User 도메인에 필요한 필드 추가
 
 }
 
