@@ -29,8 +29,29 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task copyPrivate(type: Copy) {
+	copy {
+		from './2024_BEOTKKOTTHON_TEAM_19_BE_YML/private' //위 사진과 같은 폴더 명
+		include "*.yml" //위 폴더안에 있는 yml파일 명
+		into 'src/main/resources' //복사할 위치
+	}
 }
