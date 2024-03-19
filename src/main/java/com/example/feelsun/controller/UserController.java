@@ -33,7 +33,7 @@ public class UserController {
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "회원가입 성공")
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Valid UserSignUpRequest requestDTO) {
+    public ResponseEntity<?> signup(@RequestBody @Valid UserSignUpRequest requestDTO, Errors errors) {
         userService.signup(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
     }

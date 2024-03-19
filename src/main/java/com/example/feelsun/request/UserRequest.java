@@ -12,27 +12,18 @@ public class UserRequest {
     @Setter
     public static class UserSignUpRequest {
 
-        @NotNull(message = "이메일은 필수 입력 값입니다.")
-        private String email;
+        @NotNull(message = "유저 아이디는 필수 입력 값입니다.")
+        private String username;
         @NotNull(message = "비밀번호는 필수 입력 값입니다.")
         private String password;
         @NotNull(message = "닉네임은 필수 입력 값입니다.")
         private String nickname;
-        @NotNull(message = "학교는 필수 입력 값입니다.")
-        private String school;
-        @NotNull(message = "전공은 필수 입력 값입니다.")
-        private String major;
-        @NotNull(message = "학년은 필수 입력 값입니다.")
-        private String grade;
 
         public User toEntity(UserEnum userEnum) {
             return User.builder()
-                    .email(email)
+                    .username(username)
                     .password(password)
                     .nickname(nickname)
-                    .school(school)
-                    .major(major)
-                    .grade(grade)
                     .role(userEnum)
                     .build();
         }
