@@ -1,5 +1,6 @@
 package com.example.feelsun.controller;
 
+import com.example.feelsun.config.errors.exception.Exception400;
 import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.request.UserRequest.*;
@@ -46,5 +47,27 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(loginDTO));
+    }
+
+    @PostMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestBody @Valid UserCheckUsernameRequest requestDTO, Errors errors) {
+        boolean isExists = userService.checkUsername(requestDTO);
+
+        if (isExists) {
+            throw new Exception400(null, "이미 사용중인 아이디입니다.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success("사용 가능한 아이디입니다."));
+    }
+
+    @PostMapping("/check-nickname")
+    public ResponseEntity<?> checkNickname(@RequestBody @Valid UserCheckNicknameRequest requestDTO, Errors errors) {
+        boolean isExists = userService.checkNickname(requestDTO);
+
+        if (isExists) {
+            throw new Exception400(null, "이미 사용중인 닉네임입니다.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success("사용 가능한 닉네임입니다."));
     }
 }
