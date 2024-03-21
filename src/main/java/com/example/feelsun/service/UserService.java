@@ -29,6 +29,14 @@ public class UserService {
     public void signup(UserSignUpRequest requestDTO) {
         // 비밀번호 암호화
         requestDTO.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
+        // 이미 있는 아이디일경우 예외처리
+        userJpaRepository.findByUsername(requestDTO.getUsername()).ifPresent(user -> {
+            throw new Exception400(null, "이미 존재하는 아이디입니다.");
+        });
+        // 이미 있는 닉네임일경우 예외처리
+        userJpaRepository.findByNickname(requestDTO.getNickname()).ifPresent(user -> {
+            throw new Exception400(null, "이미 존재하는 닉네임입니다.");
+        });
         // 저장
         userJpaRepository.save(requestDTO.toEntity(UserEnum.USER));
     }
