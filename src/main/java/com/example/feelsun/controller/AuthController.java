@@ -30,13 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class AuthController {
 
-    private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = RefreshTokenResponse.class)))
+                    schema = @Schema(implementation = UserLoginResponseWithToken.class)))
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody @Valid RefreshTokenRequest requestDTO, Errors errors) {
 

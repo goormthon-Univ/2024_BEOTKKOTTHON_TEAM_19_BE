@@ -32,7 +32,9 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
-    @ApiResponse(responseCode = "200", description = "회원가입 성공")
+    @ApiResponse(responseCode = "200", description = "회원가입 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserLoginResponseWithToken.class)))
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignUpRequest requestDTO, Errors errors) {
         userService.signup(requestDTO);
@@ -45,7 +47,7 @@ public class UserController {
     @Operation(summary = "로그인", description = "로그인을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "로그인 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserLoginResponse.class)))
+                    schema = @Schema(implementation = UserLoginResponseWithToken.class)))
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
