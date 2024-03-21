@@ -62,4 +62,22 @@ public class UserService {
     public boolean checkNickname(UserCheckNicknameRequest requestDTO) {
         return userJpaRepository.existsByNickname(requestDTO.getNickname());
     }
+
+    @Transactional
+    public UserLoginResponseWithToken generateToken(UserSignUpRequest requestDTO) {
+        User user = userJpaRepository.findByUsername(requestDTO.getUsername())
+                .orElseThrow(() -> new Exception400(null, "회원가입에 실패했습니다."));
+
+        String accessToken = JwtProvider.TOKEN_PREFIX + tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+
+        // 리프래쉬 토큰 생성
+        String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
+
+        // 리프래쉬 토큰을 Redis에 저장
+        refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
+
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname());
+
+        return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
+    }
 }
