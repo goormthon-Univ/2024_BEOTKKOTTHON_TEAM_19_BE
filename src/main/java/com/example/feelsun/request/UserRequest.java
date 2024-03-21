@@ -23,6 +23,7 @@ public class UserRequest {
         private String password;
 
         @NotNull(message = "닉네임은 필수 입력 값입니다.")
+        @Size(max = 8, message = "닉네임은 8자 이하로 입력해주세요.")
         private String nickname;
 
         public User toEntity(UserEnum userEnum) {

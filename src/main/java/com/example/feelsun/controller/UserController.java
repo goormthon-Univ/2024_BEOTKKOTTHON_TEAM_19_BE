@@ -32,23 +32,30 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
-    @ApiResponse(responseCode = "200", description = "회원가입 성공")
+    @ApiResponse(responseCode = "200", description = "회원가입 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserLoginResponseWithToken.class)))
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid UserSignUpRequest requestDTO, Errors errors) {
         userService.signup(requestDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
+
+        UserLoginResponseWithToken signupDTO = userService.generateToken(requestDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(signupDTO));
     }
 
     @Operation(summary = "로그인", description = "로그인을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "로그인 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserLoginResponse.class)))
+                    schema = @Schema(implementation = UserLoginResponseWithToken.class)))
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest requestDTO, Errors errors) {
         UserLoginResponseWithToken loginDTO = userService.login(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(loginDTO));
     }
 
+    @Operation(summary = "유저 아이디 중복 체크", description = "유저 아이디 중복 체크를 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "사용 가능한 아이디입니다.")
     @PostMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestBody @Valid UserCheckUsernameRequest requestDTO, Errors errors) {
         boolean isExists = userService.checkUsername(requestDTO);
@@ -60,6 +67,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success("사용 가능한 아이디입니다."));
     }
 
+    @Operation(summary = "유저 닉네임 중복 체크", description = "유저 닉네임 중복 체크를 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "사용 가능한 닉네임입니다.")
     @PostMapping("/check-nickname")
     public ResponseEntity<?> checkNickname(@RequestBody @Valid UserCheckNicknameRequest requestDTO, Errors errors) {
         boolean isExists = userService.checkNickname(requestDTO);
