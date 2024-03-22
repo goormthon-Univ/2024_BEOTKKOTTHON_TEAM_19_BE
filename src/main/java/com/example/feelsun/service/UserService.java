@@ -164,7 +164,27 @@ public class UserService {
         return treePosts
                 .getContent()
                 .stream()
-                .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getContent(), treePost.getImageUrl(), treePost.getCreatedAt()))
+                .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 나의 히스토리 목록 보기 ( 최신순 )
+     * **/
+    public List<UserHistoryListResponse> getUserHistories(PrincipalUserDetails principalUserDetails, int page, int size) {
+        // 인증
+        User user = validateUser(principalUserDetails);
+
+        // 나의 히스토리 목록 조회해서 가져오기
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<TreePost> treePosts = treePostJpaRepository.findAllByUserId(user.getId(), pageable);
+
+        // 페이징 처리해서 가져온 나의 히스토리 목록을 dto 로 만들기
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserHistoryListResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 }

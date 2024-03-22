@@ -9,13 +9,13 @@ public class UserResponse {
 
     @Getter
     @Setter
-    public static class UserHistoryResponse {
+    public static class UserHistoryListResponse {
         private Integer treePostId;
         private String treePostImageUrl;
         private String treePostContent;
         private LocalDateTime createdAt;
 
-        public UserHistoryResponse(Integer treePostId, String treePostImageUrl, String treePostContent, LocalDateTime createdAt) {
+        public UserHistoryListResponse(Integer treePostId, String treePostImageUrl, String treePostContent, LocalDateTime createdAt) {
             this.treePostId = treePostId;
             this.treePostImageUrl = treePostImageUrl;
             this.treePostContent = treePostContent;
