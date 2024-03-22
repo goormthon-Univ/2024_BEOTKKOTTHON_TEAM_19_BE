@@ -9,11 +9,35 @@ public class UserResponse {
 
     @Getter
     @Setter
+    public static class UserHistoryResponse {
+        private Integer treePostId;
+        private String treePostImageUrl;
+        private String treePostContent;
+        private LocalDateTime createdAt;
+
+        public UserHistoryResponse(Integer treePostId, String treePostImageUrl, String treePostContent, LocalDateTime createdAt) {
+            this.treePostId = treePostId;
+            this.treePostImageUrl = treePostImageUrl;
+            this.treePostContent = treePostContent;
+            this.createdAt = createdAt;
+        }
+
+    }
+
+    @Getter
+    @Setter
     public static class UserTreeDetailResponse {
         private Integer treePostId;
         private String treePostImageUrl;
         private String treePostContent;
         private LocalDateTime createdAt;
+
+        public UserTreeDetailResponse(Integer treePostId, String treePostImageUrl, String treePostContent, LocalDateTime createdAt) {
+            this.treePostId = treePostId;
+            this.treePostImageUrl = treePostImageUrl;
+            this.treePostContent = treePostContent;
+            this.createdAt = createdAt;
+        }
     }
 
     @Getter
@@ -23,6 +47,13 @@ public class UserResponse {
         private Integer treeId;
         private String habitName;
         private String treeImageUrl;
+
+        public UserTreeListResponse(Integer userId, Integer treeId, String habitName, String treeImageUrl) {
+            this.userId = userId;
+            this.treeId = treeId;
+            this.habitName = habitName;
+            this.treeImageUrl = treeImageUrl;
+        }
 
     }
 

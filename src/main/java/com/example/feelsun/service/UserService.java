@@ -135,14 +135,11 @@ public class UserService {
             redisService.addExcludedIds(String.valueOf(user.getId()), treeIds);
         }
 
-        return trees.getContent().stream().map(tree -> {
-            UserTreeListResponse dto = new UserTreeListResponse();
-            dto.setUserId(tree.getUser().getId());
-            dto.setTreeId(tree.getId());
-            dto.setHabitName(tree.getName());
-            dto.setTreeImageUrl(tree.getImageUrl());
-            return dto;
-        }).collect(Collectors.toList());
+        return trees
+                .getContent()
+                .stream()
+                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
+                .collect(Collectors.toList());
 
     }
 
@@ -157,20 +154,17 @@ public class UserService {
     public List<UserTreeDetailResponse> getUserTreeDetail(PrincipalUserDetails principalUserDetails, Integer treeId, int page, int size) {
         // 인증
         validateUser(principalUserDetails);
-        
+
         // 인증글 목록 조회해서 가져오기
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         Page<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(treeId, pageable);
 
         // 페이징 처리해서 가져온 인증글 목록을 dto 로 만들기
-        return treePosts.getContent().stream().map(treePost -> {
-            UserTreeDetailResponse dto = new UserTreeDetailResponse();
-            dto.setTreePostId(treePost.getId());
-            dto.setTreePostContent(treePost.getContent());
-            dto.setTreePostImageUrl(treePost.getImageUrl());
-            dto.setCreatedAt(treePost.getCreatedAt());
-            return dto;
-        }).collect(Collectors.toList());
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getContent(), treePost.getImageUrl(), treePost.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 }
