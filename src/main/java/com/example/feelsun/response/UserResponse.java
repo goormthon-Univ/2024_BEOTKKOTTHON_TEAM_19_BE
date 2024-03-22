@@ -7,6 +7,18 @@ public class UserResponse {
 
     @Getter
     @Setter
+    public static class UserTreeListResponse {
+        private Integer userId;
+        private Integer treeId;
+        private String habitName;
+        private String treeImageUrl;
+
+    }
+
+
+
+    @Getter
+    @Setter
     public static class UserLoginResponseWithToken {
         private UserLoginResponse loginResponseDTO;
         private String accessToken;

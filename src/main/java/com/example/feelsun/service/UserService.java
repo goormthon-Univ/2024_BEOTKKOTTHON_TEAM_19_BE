@@ -1,19 +1,31 @@
 package com.example.feelsun.service;
 
+import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.errors.exception.Exception400;
+import com.example.feelsun.config.errors.exception.Exception404;
 import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.config.jwt.refreshToken.RefreshTokenService;
+import com.example.feelsun.config.redis.RedisService;
+import com.example.feelsun.domain.Tree;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.domain.UserEnum;
+import com.example.feelsun.repository.TreeJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -24,6 +36,8 @@ public class UserService {
     private final UserJpaRepository userJpaRepository;
     private final JwtProvider tokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final TreeJpaRepository treeJpaRepository;
+    private final RedisService redisService;
 
     @Transactional
     public void signup(UserSignUpRequest requestDTO) {
@@ -87,5 +101,49 @@ public class UserService {
         UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname());
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
+    }
+    /**
+     * 어떻게 랜덤하게 사용자들의 트리 정보를 가져올 수 있을까?
+     * 1. 중복되지 않고 랜덤하게 나무 정보를 가져온다.
+     **/
+
+    public List<UserTreeListResponse> getUserTreeList(PrincipalUserDetails principalUserDetails, int page, int size) {
+        // 인증
+        User user = validateUser(principalUserDetails);
+
+        // redis 에 저장해둔 나무 정보 리스트 가져오기
+        Set<Integer> excludedIds = redisService.getExcludedIds(String.valueOf(user.getId()));
+
+        Specification<Tree> spec = (root, query, cb) -> {
+            Predicate notInExcludedIds = cb.not(root.get("id").in(excludedIds));
+            query.orderBy(cb.desc(cb.function("RAND", Double.class))); // 랜덤 정렬
+            return notInExcludedIds;
+        };
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Tree> trees = treeJpaRepository.findAll(spec, pageable);
+
+        // 조회된 나무 ID 목록을 Redis에 저장
+        Set<Integer> treeIds = trees.getContent().stream().map(Tree::getId).collect(Collectors.toSet());
+
+        if (!treeIds.isEmpty()) {
+            redisService.addExcludedIds(String.valueOf(user.getId()), treeIds);
+        }
+
+        return trees.getContent().stream().map(tree -> {
+            UserTreeListResponse dto = new UserTreeListResponse();
+            dto.setUserId(tree.getUser().getId());
+            dto.setTreeId(tree.getId());
+            dto.setHabitName(tree.getName());
+            dto.setTreeImageUrl(tree.getImageUrl());
+            return dto;
+        }).collect(Collectors.toList());
+
+    }
+
+    private User validateUser(PrincipalUserDetails principalUserDetails) {
+       return userJpaRepository.findByUsername(principalUserDetails.getUser().getUsername())
+                .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
     }
 }
