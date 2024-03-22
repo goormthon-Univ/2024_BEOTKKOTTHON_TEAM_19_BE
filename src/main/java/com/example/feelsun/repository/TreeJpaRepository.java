@@ -12,5 +12,8 @@ import java.util.List;
 public interface TreeJpaRepository extends JpaRepository<Tree, Integer> {
 
     Page<Tree> findAll(Specification<Tree> spec, Pageable pageable);
+  
     List<Tree> findByUser(User user);
+  
+    List<Tree> findAllByUserId(Integer userId);
 }

@@ -7,17 +7,21 @@ import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.config.jwt.refreshToken.RefreshTokenService;
 import com.example.feelsun.config.redis.RedisService;
 import com.example.feelsun.domain.Tree;
+import com.example.feelsun.domain.TreePost;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.domain.UserEnum;
 import com.example.feelsun.repository.TreeJpaRepository;
+import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
+import com.example.feelsun.response.UserResponse.UserShareResponse.UserShareTreeResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +42,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final TreeJpaRepository treeJpaRepository;
     private final RedisService redisService;
+    private final TreePostJpaRepository treePostJpaRepository;
 
     @Transactional
     public void signup(UserSignUpRequest requestDTO) {
@@ -106,7 +111,6 @@ public class UserService {
      * 어떻게 랜덤하게 사용자들의 트리 정보를 가져올 수 있을까?
      * 1. 중복되지 않고 랜덤하게 나무 정보를 가져온다.
      **/
-
     public List<UserTreeListResponse> getUserTreeList(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
@@ -125,25 +129,89 @@ public class UserService {
         Page<Tree> trees = treeJpaRepository.findAll(spec, pageable);
 
         // 조회된 나무 ID 목록을 Redis에 저장
-        Set<Integer> treeIds = trees.getContent().stream().map(Tree::getId).collect(Collectors.toSet());
+        Set<Integer> treeIds = trees.
+                getContent()
+                .stream()
+                .map(Tree::getId)
+                .collect(Collectors.toSet());
 
         if (!treeIds.isEmpty()) {
             redisService.addExcludedIds(String.valueOf(user.getId()), treeIds);
         }
 
-        return trees.getContent().stream().map(tree -> {
-            UserTreeListResponse dto = new UserTreeListResponse();
-            dto.setUserId(tree.getUser().getId());
-            dto.setTreeId(tree.getId());
-            dto.setHabitName(tree.getName());
-            dto.setTreeImageUrl(tree.getImageUrl());
-            return dto;
-        }).collect(Collectors.toList());
+        return trees
+                .getContent()
+                .stream()
+                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
+                .toList();
 
     }
 
     private User validateUser(PrincipalUserDetails principalUserDetails) {
        return userJpaRepository.findByUsername(principalUserDetails.getUser().getUsername())
                 .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
+    }
+
+    /**
+     * 나무를 클릭했을 때, 인증글 목록 리스트 보여주기
+     * **/
+    public List<UserTreeDetailResponse> getUserTreeDetail(PrincipalUserDetails principalUserDetails, Integer treeId, int page, int size) {
+        // 인증
+        validateUser(principalUserDetails);
+
+        // 인증글 목록 조회해서 가져오기
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(treeId, pageable);
+
+        // 페이징 처리해서 가져온 인증글 목록을 dto 로 만들기
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
+                .toList();
+    }
+
+    /**
+     * 나의 히스토리 목록 보기 ( 최신순 )
+     * **/
+    public List<UserHistoryListResponse> getUserHistories(PrincipalUserDetails principalUserDetails, int page, int size) {
+        // 인증
+        User user = validateUser(principalUserDetails);
+
+        // redis 에 존재하는 자신의 나무 id 목록 지우기
+        redisService.deleteExcludedIds(String.valueOf(user.getId()));
+
+        // 나의 히스토리 목록 조회해서 가져오기
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<TreePost> treePosts = treePostJpaRepository.findAllByUserId(user.getId(), pageable);
+
+        // 페이징 처리해서 가져온 나의 히스토리 목록을 dto 로 만들기
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserHistoryListResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
+                .toList();
+    }
+
+    /**
+     * 공유 버튼을 눌렀을 때 보여주는 API
+     * 1. 나무 목록 가져오기
+     * 2. DTO 만들기
+     * **/
+    public UserShareResponse getUserShare(Integer userId) {
+        User user = userJpaRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
+
+        List<Tree> trees = treeJpaRepository.findAllByUserId(userId);
+
+        List<UserShareTreeResponse> userShareTreeResponses = trees
+                .stream()
+                .map(tree -> new UserShareTreeResponse(tree.getId(), tree.getName(), tree.getImageUrl()))
+                .toList();
+
+        return new UserShareResponse(user.getNickname(), userShareTreeResponses);
+
     }
 }
