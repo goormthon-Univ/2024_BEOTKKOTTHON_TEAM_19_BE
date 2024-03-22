@@ -3,7 +3,18 @@ package com.example.feelsun.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 public class UserResponse {
+
+    @Getter
+    @Setter
+    public static class UserTreeDetailResponse {
+        private Integer treePostId;
+        private String treePostImageUrl;
+        private String treePostContent;
+        private LocalDateTime createdAt;
+    }
 
     @Getter
     @Setter
