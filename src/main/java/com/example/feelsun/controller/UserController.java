@@ -114,5 +114,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(historyListDTO));
     }
 
+    @Operation(summary = "유저의 공유 정보 조회", description = "유저의 공유 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저의 공유 정보 조회 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserShareResponse.class)))
+    @GetMapping("/{userId}/share")
+    public ResponseEntity<?> getUserShare(@PathVariable("userId") Integer userId) {
+        UserShareResponse shareDTO = userService.getUserShare(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(shareDTO));
+    }
+
 
 }

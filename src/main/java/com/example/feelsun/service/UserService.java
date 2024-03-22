@@ -15,6 +15,7 @@ import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
+import com.example.feelsun.response.UserResponse.UserShareResponse.UserShareTreeResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -195,5 +196,25 @@ public class UserService {
                 .stream()
                 .map(treePost -> new UserHistoryListResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
                 .toList();
+    }
+
+    /**
+     * 공유 버튼을 눌렀을 때 보여주는 API
+     * 1. 나무 목록 가져오기
+     * 2. DTO 만들기
+     * **/
+    public UserShareResponse getUserShare(Integer userId) {
+        User user = userJpaRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
+
+        List<Tree> trees = treeJpaRepository.findAllByUserId(userId);
+
+        List<UserShareTreeResponse> userShareTreeResponses = trees
+                .stream()
+                .map(tree -> new UserShareTreeResponse(tree.getId(), tree.getName(), tree.getImageUrl()))
+                .toList();
+
+        return new UserShareResponse(user.getNickname(), userShareTreeResponses);
+
     }
 }

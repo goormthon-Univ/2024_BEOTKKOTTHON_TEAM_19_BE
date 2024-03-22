@@ -4,8 +4,35 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserResponse {
+
+    @Getter
+    @Setter
+    public static class UserShareResponse {
+        private String nickname;
+        private List<UserShareTreeResponse> userShareTreeResponse;
+
+        public UserShareResponse(String nickname, List<UserShareTreeResponse> userShareTreeResponse) {
+            this.nickname = nickname;
+            this.userShareTreeResponse = userShareTreeResponse;
+        }
+
+        @Getter
+        @Setter
+        public static class UserShareTreeResponse {
+            private Integer treeId;
+            private String habitName;
+            private String treeImageUrl;
+
+            public UserShareTreeResponse(Integer treeId, String habitName, String treeImageUrl) {
+                this.treeId = treeId;
+                this.habitName = habitName;
+                this.treeImageUrl = treeImageUrl;
+            }
+        }
+    }
 
     @Getter
     @Setter
