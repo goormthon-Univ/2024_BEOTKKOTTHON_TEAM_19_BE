@@ -1,7 +1,7 @@
 package com.example.feelsun.controller;
 
+import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.errors.exception.Exception400;
-import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
@@ -10,23 +10,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -79,4 +76,17 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success("사용 가능한 닉네임입니다."));
     }
+
+    @Operation(summary = "유저의 나무 랜덤 리스트 조회", description = "유저의 나무 랜덤 리스트를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저의 나무 랜덤 리스트 조회 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserTreeListResponse.class)))
+    @GetMapping("/list")
+    public ResponseEntity<?> getUserTreeList(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
+                                             @RequestParam(value = "page", defaultValue = "0") int page,
+                                             @RequestParam(value = "size", defaultValue = "5") int size) {
+        List<UserTreeListResponse> treeListDTO = userService.getUserTreeList(principalUserDetails, page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
+    }
+
 }

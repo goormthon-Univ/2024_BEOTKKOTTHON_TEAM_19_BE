@@ -1,7 +1,6 @@
 package com.example.feelsun.config.redis;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -10,7 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -58,6 +60,7 @@ public class RedisService {
         return Boolean.TRUE.equals(values.hasKey(key, hashKey)) ? (String) redisTemplate.opsForHash().get(key, hashKey) : "";
     }
 
+    @Transactional
     public void deleteHashOps(String key, String hashKey) {
         HashOperations<String, Object, Object> values = redisTemplate.opsForHash();
         values.delete(key, hashKey);
@@ -66,4 +69,31 @@ public class RedisService {
     public boolean checkExistsValue(String value) {
         return !value.equals("false");
     }
+
+    @Transactional
+    public void addExcludedIds(String userId, Set<Integer> ids) {
+        String key = "excludedIds:" + userId;
+        redisTemplate.opsForSet().add(key, ids.stream().map(String::valueOf).distinct().toArray(String[]::new));
+        redisTemplate.expire(key, 1, TimeUnit.HOURS); // 1시간 후 만료
+    }
+
+    @Transactional
+    public Set<Integer> getExcludedIds(String userId) {
+        String key = "excludedIds:" + userId;
+        Set<Object> excludedIdObjects = redisTemplate.opsForSet().members(key);
+        if (excludedIdObjects == null) {
+            return Set.of();
+        }
+        return excludedIdObjects.stream()
+                .map(object -> {
+                    try {
+                        return Integer.parseInt(object.toString()); // Object를 String으로 변환한 후 Long으로 파싱
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull) // 파싱에 실패한 경우(null 반환)를 필터링
+                .collect(Collectors.toSet());
+    }
+
 }
