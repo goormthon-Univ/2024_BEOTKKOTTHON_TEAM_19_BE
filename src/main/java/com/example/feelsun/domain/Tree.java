@@ -1,13 +1,16 @@
 package com.example.feelsun.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Entity
 @Table(name = "trees")
@@ -47,5 +50,20 @@ public class Tree {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public Tree(String name, User user) {
+        this.name = name;
+        this.user = user;
+        this.level = 1;
+        this.imageUrl = "https://via.placeholder.com/150";
+        this.experience = 1;
+        this.price = 0;
+        this.accessLevel = TreeEnum.FREE;
+        this.startDate = LocalDateTime.now();
+        this.endDate = this.startDate.plusDays(60);
+        this.createdAt = LocalDateTime.now();
+    }
+
 
 }
