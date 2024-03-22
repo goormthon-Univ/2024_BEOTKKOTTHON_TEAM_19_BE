@@ -111,8 +111,6 @@ public class UserService {
      * 어떻게 랜덤하게 사용자들의 트리 정보를 가져올 수 있을까?
      * 1. 중복되지 않고 랜덤하게 나무 정보를 가져온다.
      **/
-
-    @Transactional
     public List<UserTreeListResponse> getUserTreeList(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
@@ -177,13 +175,12 @@ public class UserService {
     /**
      * 나의 히스토리 목록 보기 ( 최신순 )
      * **/
-    @Transactional
     public List<UserHistoryListResponse> getUserHistories(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
 
         // redis 에 존재하는 자신의 나무 id 목록 지우기
-        redisService.deleteValues(String.valueOf(user.getId()));
+        redisService.deleteExcludedIds(String.valueOf(user.getId()));
 
         // 나의 히스토리 목록 조회해서 가져오기
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
