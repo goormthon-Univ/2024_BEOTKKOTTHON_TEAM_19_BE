@@ -19,6 +19,9 @@ public class TreePost {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tree tree;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
     @Column(nullable = false)
     private String content;
 
