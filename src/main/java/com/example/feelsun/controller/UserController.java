@@ -102,4 +102,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeDTO));
     }
 
+    @Operation(summary = "유저의 히스토리 인증글 목록 조회", description = "유저의 히스토리 인증글 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "인증글 목록 조회 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserHistoryListResponse.class)))
+    @GetMapping("/histories")
+    public ResponseEntity<?> getUserHistories(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
+                                              @RequestParam(value = "page", defaultValue = "0") int page,
+                                              @RequestParam(value = "size", defaultValue = "5") int size) {
+        List<UserHistoryListResponse> historyListDTO = userService.getUserHistories(principalUserDetails, page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(historyListDTO));
+    }
+
+
 }
