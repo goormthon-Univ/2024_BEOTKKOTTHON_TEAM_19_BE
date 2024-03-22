@@ -81,7 +81,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "유저의 나무 랜덤 리스트 조회 성공",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserTreeListResponse.class)))
-    @GetMapping("/list")
+    @GetMapping("/tree-list")
     public ResponseEntity<?> getUserTreeList(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                              @RequestParam(value = "size", defaultValue = "5") int size) {
