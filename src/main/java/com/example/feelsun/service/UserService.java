@@ -15,6 +15,7 @@ import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
+import com.example.feelsun.response.UserResponse.UserShareResponse.UserShareTreeResponse;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -110,7 +111,6 @@ public class UserService {
      * 어떻게 랜덤하게 사용자들의 트리 정보를 가져올 수 있을까?
      * 1. 중복되지 않고 랜덤하게 나무 정보를 가져온다.
      **/
-
     public List<UserTreeListResponse> getUserTreeList(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
@@ -129,7 +129,11 @@ public class UserService {
         Page<Tree> trees = treeJpaRepository.findAll(spec, pageable);
 
         // 조회된 나무 ID 목록을 Redis에 저장
-        Set<Integer> treeIds = trees.getContent().stream().map(Tree::getId).collect(Collectors.toSet());
+        Set<Integer> treeIds = trees.
+                getContent()
+                .stream()
+                .map(Tree::getId)
+                .collect(Collectors.toSet());
 
         if (!treeIds.isEmpty()) {
             redisService.addExcludedIds(String.valueOf(user.getId()), treeIds);
@@ -139,7 +143,7 @@ public class UserService {
                 .getContent()
                 .stream()
                 .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
-                .collect(Collectors.toList());
+                .toList();
 
     }
 
@@ -165,7 +169,7 @@ public class UserService {
                 .getContent()
                 .stream()
                 .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -174,6 +178,9 @@ public class UserService {
     public List<UserHistoryListResponse> getUserHistories(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
+
+        // redis 에 존재하는 자신의 나무 id 목록 지우기
+        redisService.deleteExcludedIds(String.valueOf(user.getId()));
 
         // 나의 히스토리 목록 조회해서 가져오기
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
@@ -185,6 +192,26 @@ public class UserService {
                 .getContent()
                 .stream()
                 .map(treePost -> new UserHistoryListResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    /**
+     * 공유 버튼을 눌렀을 때 보여주는 API
+     * 1. 나무 목록 가져오기
+     * 2. DTO 만들기
+     * **/
+    public UserShareResponse getUserShare(Integer userId) {
+        User user = userJpaRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
+
+        List<Tree> trees = treeJpaRepository.findAllByUserId(userId);
+
+        List<UserShareTreeResponse> userShareTreeResponses = trees
+                .stream()
+                .map(tree -> new UserShareTreeResponse(tree.getId(), tree.getName(), tree.getImageUrl()))
+                .toList();
+
+        return new UserShareResponse(user.getNickname(), userShareTreeResponses);
+
     }
 }

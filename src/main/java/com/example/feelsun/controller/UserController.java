@@ -77,11 +77,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success("사용 가능한 닉네임입니다."));
     }
 
-    @Operation(summary = "유저의 나무 랜덤 리스트 조회", description = "유저의 나무 랜덤 리스트를 조회합니다.")
+    @Operation(summary = "둘러보기 페이지에서 유저의 나무 랜덤 리스트 조회", description = "둘러보기 페이지에서 유저의 나무 랜덤 리스트를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저의 나무 랜덤 리스트 조회 성공",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = UserTreeListResponse.class)))
-    @GetMapping("/list")
+    @GetMapping("/tree-list")
     public ResponseEntity<?> getUserTreeList(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                              @RequestParam(value = "size", defaultValue = "5") int size) {
@@ -112,6 +112,16 @@ public class UserController {
                                               @RequestParam(value = "size", defaultValue = "5") int size) {
         List<UserHistoryListResponse> historyListDTO = userService.getUserHistories(principalUserDetails, page, size);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(historyListDTO));
+    }
+
+    @Operation(summary = "유저의 공유 정보 조회", description = "유저의 공유 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저의 공유 정보 조회 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserShareResponse.class)))
+    @GetMapping("/{userId}/share")
+    public ResponseEntity<?> getUserShare(@PathVariable("userId") Integer userId) {
+        UserShareResponse shareDTO = userService.getUserShare(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(shareDTO));
     }
 
 
