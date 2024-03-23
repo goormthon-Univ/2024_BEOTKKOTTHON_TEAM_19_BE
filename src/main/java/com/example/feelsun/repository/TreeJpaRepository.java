@@ -24,5 +24,18 @@ public interface TreeJpaRepository extends JpaRepository<Tree, Integer> {
     @Query("UPDATE Tree t SET t.certification = :newValue")
     void updateBooleanFieldForAllTrees(@Param("newValue") boolean newValue);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tree t SET t.deadline = t.deadline + 1 WHERE t.certification=false")
+    void updateDeadlineIfConditionIsMet();
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tree t SET t.dead=true WHERE t.deadline>6")
+    void updateDeadBooleanForAllTrees();
     List<Tree> findAllByUserId(Integer userId);
+
+    @Transactional
+    @Query("SELECT t FROM Tree t WHERE t.dead = true and t.user = :newUser")
+    List<Tree> selectDeadTree(@Param("newValue") User newUser);
 }

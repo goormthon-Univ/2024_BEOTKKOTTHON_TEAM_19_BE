@@ -96,8 +96,10 @@ public class TreeService {
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    public void reset() {
+    public void resetPlus() {
         treeRepository.updateBooleanFieldForAllTrees(false);
+        treeRepository.updateDeadlineIfConditionIsMet();
+        treeRepository.updateDeadBooleanForAllTrees();
     }
 
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
@@ -108,7 +110,6 @@ public class TreeService {
         response.setTreeLevel(tree.getLevel());
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
-        response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
         response.setPrice(tree.getPrice());
         response.setAccessLevel(tree.getAccessLevel());

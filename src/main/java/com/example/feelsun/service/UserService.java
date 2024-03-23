@@ -77,7 +77,16 @@ public class UserService {
         // 리프래쉬 토큰을 Redis에 저장
         refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
 
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname());
+        List<Tree> deadTrees;
+        deadTrees = treeJpaRepository.selectDeadTree(user);
+        boolean feedback = false;
+        Integer deadtree = 0;
+        if(!deadTrees.isEmpty()){
+            feedback = true;
+            deadtree = deadTrees.get(0).getId();
+        }
+
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
@@ -102,8 +111,16 @@ public class UserService {
 
         // 리프래쉬 토큰을 Redis에 저장
         refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
+        List<Tree> deadTrees;
+        deadTrees = treeJpaRepository.selectDeadTree(user);
 
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname());
+        boolean feedback = false;
+        Integer deadtree = 0;
+        if(!deadTrees.isEmpty()){
+            feedback = true;
+            deadtree = deadTrees.get(0).getId();
+        }
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
