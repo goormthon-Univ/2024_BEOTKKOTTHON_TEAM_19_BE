@@ -26,8 +26,6 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String salt;
 
-    public static final String TOKEN_PREFIX = "Bearer ";
-
     private Key secretKey;
 
     // 만료시간 1시간
