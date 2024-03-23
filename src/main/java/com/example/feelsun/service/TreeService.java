@@ -95,9 +95,13 @@ public class TreeService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    public void reset() {
+    @Scheduled(cron = "0/20 * * * * *", zone = "Asia/Seoul")
+    public void resetPlus() {
         treeRepository.updateBooleanFieldForAllTrees(false);
+        treeRepository.updateDeadlineIfConditionIsMet();
+        treeRepository.updateDeadBooleanForAllTrees();
+        List<Tree> trees = treeRepository.findAll();
+        for (Tree tree : trees) System.out.println(tree.getDeadline() + "|" + tree.isDead());
     }
 
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
@@ -108,7 +112,6 @@ public class TreeService {
         response.setTreeLevel(tree.getLevel());
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
-        response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
         response.setPrice(tree.getPrice());
         response.setAccessLevel(tree.getAccessLevel());
@@ -133,7 +136,6 @@ public class TreeService {
         response.setTreeLevel(tree.getLevel());
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
-        response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
         response.setContinuousPeriod(tree.getContinuousPeriod());
 
