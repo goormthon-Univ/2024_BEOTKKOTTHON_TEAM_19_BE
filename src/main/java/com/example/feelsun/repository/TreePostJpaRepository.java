@@ -9,4 +9,6 @@ public interface TreePostJpaRepository extends JpaRepository<TreePost, Integer> 
     Page<TreePost> findAllByTreeId(Integer treeId, Pageable pageable);
 
     Page<TreePost> findAllByUserId(Integer userId, Pageable pageable);
+
+    int countByTreeId(Integer treeId);
 }

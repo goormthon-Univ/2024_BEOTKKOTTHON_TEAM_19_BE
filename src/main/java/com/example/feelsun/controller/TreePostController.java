@@ -61,4 +61,13 @@ public class TreePostController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
     }
 
+    @Operation(summary = "나무 전체 인증글 수를 가져옵니다", description = "나무 전체 인증글 수를 가져옵니다")
+    @ApiResponse(responseCode = "200", description = "나무 전체 인증글 수를 가져옵니다")
+    @GetMapping("/{treeId}/post-counts")
+    public ResponseEntity<?> getTreePostCounts(@PathVariable("treeId") Integer treeId,
+                                               @AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
+        int count = treePostService.getTreePostCounts(treeId, principalUserDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(count));
+    }
+
 }
