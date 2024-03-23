@@ -9,6 +9,7 @@ import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.TreeRequest;
 import com.example.feelsun.response.TreeResponse;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,19 +71,27 @@ public class TreeService {
     public TreeResponse.UserContinuousPeriod getUserContinuousPeriod(List<TreeResponse.MainTreeList> treeList){
         List<Integer> continuousperiodlist = new ArrayList<Integer>();
         for (TreeResponse.MainTreeList tree : treeList) {
-            if (!continuousperiodlist.isEmpty()) {
+            if (continuousperiodlist.isEmpty()) {
                 continuousperiodlist.add(tree.getContinuousPeriod());
             } else {
-                if (continuousperiodlist.getFirst()<tree.getContinuousPeriod()) {
-                    continuousperiodlist.addLast(tree.getContinuousPeriod());
-                    continuousperiodlist.removeFirst();
+                if (continuousperiodlist.get(0) < tree.getContinuousPeriod()) {
+                    continuousperiodlist.add(tree.getContinuousPeriod());
+                    continuousperiodlist.remove(0);
                 }
             }
         }
-        int usercountinousperiod = continuousperiodlist.getFirst();
+
+        int usercountinousperiod = continuousperiodlist.get(0);
         TreeResponse.UserContinuousPeriod response = new TreeResponse.UserContinuousPeriod();
         response.setUserContinuousPeriod(usercountinousperiod);
+
         return response;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    public void reset() {
+        treeRepository.updateBooleanFieldForAllTrees(false);
     }
 
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
@@ -94,11 +103,9 @@ public class TreeService {
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
         response.setTreeImageUrl(tree.getImageUrl());
-        response.setImageUrl(tree.getImageUrl()); // Assuming same URL for both tree image and user image
+        response.setImageUrl(tree.getImageUrl());
         response.setPrice(tree.getPrice());
         response.setAccessLevel(tree.getAccessLevel());
-        response.setStartDate(tree.getStartDate());
-        response.setEndDate(tree.getEndDate());
         response.setCreatedAt(tree.getCreatedAt());
 
         return response;
