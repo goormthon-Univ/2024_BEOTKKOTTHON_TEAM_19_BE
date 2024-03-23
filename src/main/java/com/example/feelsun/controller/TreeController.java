@@ -45,7 +45,6 @@ public class TreeController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
     @GetMapping("/{treeId}")
-
     public ResponseEntity<?> treeDetail(@PathVariable("treeId") Integer treeId) {
         TreeResponse.TreeDetail treeDetailsDTO = treeService.getTreeDetails(treeId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeDetailsDTO));
@@ -77,8 +76,7 @@ public class TreeController {
             @AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
             @RequestBody @Valid TreeRequest.TreeCreateRequest requestDTO) {
         treeService.updateTreeName(treeId, requestDTO, principalUserDetails);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(requestDTO));
-    }
+
 
     @DeleteMapping("/delete/{treeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -31,6 +31,19 @@ public class TreePostController {
     private final UserService userService;
     private final TreePostService treePostService;
 
+
+
+
+    @Operation(summary = "유저가 쓴 총 인증글 개수", description = "유저가 쓴 총 인증글 개수를 불러옵니다.")
+    @ApiResponse(responseCode = "200", description = "유저가 쓴 총 인증글 개수를 불러옵니다.",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserTreeDetailResponse.class)))
+    @PostMapping("/userpost")
+    public Integer getUserTreePostAll(PrincipalUserDetails principalUserDetails) {
+        Integer userAllPost = treePostService.userTreePostAll(principalUserDetails);
+        return userAllPost;
+    }
+
     @Operation(summary = "나무와 관련된 인증글 목록을 가져옵니다", description = "나무와 관련된 인증글 목록을 가져옵니다")
     @ApiResponse(responseCode = "200", description = "나무와 관련된 인증글 목록을 가져옵니다",
             content = @Content(mediaType = "application/json",

@@ -19,6 +19,8 @@ public interface TreeJpaRepository extends JpaRepository<Tree, Integer> {
 
     List<Tree> findByUser(User user);
 
+    List<Tree> findAllByUserId(Integer userId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Tree t SET t.certification = :newValue")
@@ -33,7 +35,11 @@ public interface TreeJpaRepository extends JpaRepository<Tree, Integer> {
     @Transactional
     @Query("UPDATE Tree t SET t.dead=true WHERE t.deadline>6")
     void updateDeadBooleanForAllTrees();
-    List<Tree> findAllByUserId(Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Tree t SET t.name = :newValue where t.id = :treeId")
+    void treeUpdateName(@Param("newValue") String newValue, @Param("treeId") Integer treeId);
 
     @Transactional
     @Query("SELECT t FROM Tree t WHERE t.dead = true and t.user = :newUser")
