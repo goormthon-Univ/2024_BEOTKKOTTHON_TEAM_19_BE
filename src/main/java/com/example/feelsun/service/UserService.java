@@ -69,7 +69,7 @@ public class UserService {
             throw new Exception400(null, "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String accessToken = JwtProvider.TOKEN_PREFIX + tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+        String accessToken = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         // 리프래쉬 토큰 생성
         String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
@@ -104,7 +104,7 @@ public class UserService {
         User user = userJpaRepository.findByUsername(requestDTO.getUsername())
                 .orElseThrow(() -> new Exception400(null, "회원가입에 실패했습니다."));
 
-        String accessToken = JwtProvider.TOKEN_PREFIX + tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+        String accessToken = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         // 리프래쉬 토큰 생성
         String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
