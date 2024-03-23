@@ -44,12 +44,6 @@ public class Tree {
     @Column(nullable = false)
     private TreeEnum accessLevel;
 
-    @Column(nullable = false)
-    private LocalDateTime startDate;
-
-    @Column(nullable = false)
-    private LocalDateTime endDate;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -66,8 +60,6 @@ public class Tree {
         this.experience = 1;
         this.price = 0;
         this.accessLevel = TreeEnum.FREE;
-        this.startDate = LocalDateTime.now();
-        this.endDate = this.startDate.plusDays(60);
         this.createdAt = LocalDateTime.now();
         this.continuousPeriod = 0;
         this.certification = false;
