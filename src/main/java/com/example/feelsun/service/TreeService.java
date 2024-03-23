@@ -100,8 +100,6 @@ public class TreeService {
         treeRepository.updateBooleanFieldForAllTrees(false);
         treeRepository.updateDeadlineIfConditionIsMet();
         treeRepository.updateDeadBooleanForAllTrees();
-        List<Tree> trees = treeRepository.findAll();
-        for (Tree tree : trees) System.out.println(tree.getDeadline() + "|" + tree.isDead());
     }
 
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
