@@ -115,6 +115,18 @@ public class UserService {
         // 인증
         User user = validateUser(principalUserDetails);
 
+        // 자기자신의 나무는 보이지 않도록 redis 에 저장
+        List<Tree> myTrees = treeJpaRepository.findAllByUserId(user.getId());
+
+        Set<Integer> myTreeIds = myTrees
+                .stream()
+                .map(Tree::getId)
+                .collect(Collectors.toSet());
+
+        if (!myTreeIds.isEmpty()) {
+            redisService.addExcludedIds(String.valueOf(user.getId()), myTreeIds);
+        }
+
         // redis 에 저장해둔 나무 정보 리스트 가져오기
         Set<Integer> excludedIds = redisService.getExcludedIds(String.valueOf(user.getId()));
 
