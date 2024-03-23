@@ -142,4 +142,17 @@ public class TreeService {
     }
 
 
+    @Transactional
+    public void updateTreeName(Integer treeId, TreeRequest.TreeCreateRequest requestDTO, PrincipalUserDetails principalUserDetails) {
+        Tree tree = treeRepository.findById(treeId)
+                .orElseThrow(() -> new Exception404("습관 정보를 찾을 수 없습니다."));
+
+        if (!tree.getUser().getId().equals(principalUserDetails.getUser().getId())) {
+            throw new Exception404("습관 정보를 찾을 수 없습니다.");
+        }
+
+        tree.setName(requestDTO.getName());
+
+        treeRepository.save(tree);
+    }
 }

@@ -71,6 +71,15 @@ public class TreeController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(UserContinuousPeriodDTO));
     }
 
+    @PatchMapping("/{treeId}")
+    public ResponseEntity<?> updateTreeName(
+            @PathVariable Integer treeId,
+            @AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
+            @RequestBody @Valid TreeRequest.TreeCreateRequest requestDTO) {
+        treeService.updateTreeName(treeId, requestDTO, principalUserDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(requestDTO));
+    }
+
     @DeleteMapping("/delete/{treeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTree(@PathVariable Integer treeId) {
