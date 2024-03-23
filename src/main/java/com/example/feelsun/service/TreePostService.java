@@ -2,7 +2,6 @@ package com.example.feelsun.service;
 
 import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.errors.exception.Exception401;
-import com.example.feelsun.config.errors.exception.Exception403;
 import com.example.feelsun.config.errors.exception.Exception404;
 import com.example.feelsun.config.s3.S3UploadService;
 import com.example.feelsun.domain.Tree;
@@ -12,12 +11,16 @@ import com.example.feelsun.repository.TreeJpaRepository;
 import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.TreePostRequest;
+import com.example.feelsun.response.TreePostResponse.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RequiredArgsConstructor
 @Transactional
@@ -70,7 +73,7 @@ public class TreePostService {
                 .orElseThrow(() -> new Exception404("사용자를 찾을 수 없습니다."));
     }
 
-    public int getTreePostCounts(Integer treeId, PrincipalUserDetails principalUserDetails) {
+    public TreePostCountResponse getTreePostCounts(Integer treeId, PrincipalUserDetails principalUserDetails) {
         // 인증
         User user = validateUser(principalUserDetails);
 
@@ -78,11 +81,15 @@ public class TreePostService {
         Tree tree = treeJpaRepository.findById(treeId)
                 .orElseThrow(() -> new Exception404("나무를 찾을 수 없습니다."));
 
-        // 나무 데이터에서 가져온 값과 현재 유저 아이디 값이 다를 경우 예외처리
-        if (!tree.getUser().getId().equals(user.getId())) {
-            throw new Exception401("인증되지 않은 사용자입니다.");
-        }
+        // 전체 인증글 수 조회
+        int totalCount = treePostJpaRepository.countByTreeId(treeId);
 
-        return treePostJpaRepository.countByTreeId(treeId);
+        // 오늘 날짜의 시작 시간과 종료 시간을 계산
+        LocalDateTime startOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime startOfNextDay = startOfToday.plusDays(1);
+
+// 수정된 메서드를 호출
+        int todayCount = treePostJpaRepository.countByTreeIdAndCreatedAt(treeId, startOfToday, startOfNextDay);
+        return new TreePostCountResponse(todayCount, totalCount);
     }
 }
