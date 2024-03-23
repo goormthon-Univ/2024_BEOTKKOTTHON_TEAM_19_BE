@@ -1,6 +1,7 @@
 package com.example.feelsun.request;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class TreePostRequest {
         private String content;
 
         @NotNull(message = "습관 일지 이미지는 필수 입력 값입니다.")
+        @Pattern(regexp = "^(.+)\\.(jpg|jpeg|png|gif)$", message = "지원되지 않는 이미지 확장자명입니다.")
         private String imageUrl;
     }
 }
