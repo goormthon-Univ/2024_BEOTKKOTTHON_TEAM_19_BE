@@ -134,7 +134,6 @@ public class TreeService {
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
         response.setTreeImageUrl(tree.getImageUrl());
-        response.setImageUrl(tree.getImageUrl());
         response.setContinuousPeriod(tree.getContinuousPeriod());
         response.setCertification(tree.isCertification());
 

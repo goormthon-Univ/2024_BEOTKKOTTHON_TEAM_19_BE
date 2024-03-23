@@ -16,7 +16,6 @@ public class TreeResponse {
         private Integer experience;
         private String habitName;
         private String treeImageUrl;
-        private String imageUrl;
         private Integer continuousPeriod;
         private boolean certification;
     }
