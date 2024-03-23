@@ -7,9 +7,11 @@ import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.config.jwt.refreshToken.RefreshTokenService;
 import com.example.feelsun.config.redis.RedisService;
 import com.example.feelsun.domain.Tree;
+import com.example.feelsun.domain.TreePost;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.domain.UserEnum;
 import com.example.feelsun.repository.TreeJpaRepository;
+import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.UserRequest.*;
 import com.example.feelsun.response.UserResponse.*;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final TreeJpaRepository treeJpaRepository;
     private final RedisService redisService;
+    private final TreePostJpaRepository treePostJpaRepository;
 
     @Transactional
     public void signup(UserSignUpRequest requestDTO) {
@@ -131,19 +135,56 @@ public class UserService {
             redisService.addExcludedIds(String.valueOf(user.getId()), treeIds);
         }
 
-        return trees.getContent().stream().map(tree -> {
-            UserTreeListResponse dto = new UserTreeListResponse();
-            dto.setUserId(tree.getUser().getId());
-            dto.setTreeId(tree.getId());
-            dto.setHabitName(tree.getName());
-            dto.setTreeImageUrl(tree.getImageUrl());
-            return dto;
-        }).collect(Collectors.toList());
+        return trees
+                .getContent()
+                .stream()
+                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
+                .collect(Collectors.toList());
 
     }
 
     private User validateUser(PrincipalUserDetails principalUserDetails) {
-       return userJpaRepository.findByUsername(principalUserDetails.getUser().getUsername())
+        return userJpaRepository.findByUsername(principalUserDetails.getUser().getUsername())
                 .orElseThrow(() -> new Exception404("사용자 정보를 찾을 수 없습니다."));
+    }
+
+    /**
+     * 나무를 클릭했을 때, 인증글 목록 리스트 보여주기
+     * **/
+    public List<UserTreeDetailResponse> getUserTreeDetail(PrincipalUserDetails principalUserDetails, Integer treeId, int page, int size) {
+        // 인증
+        validateUser(principalUserDetails);
+
+        // 인증글 목록 조회해서 가져오기
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(treeId, pageable);
+
+        // 페이징 처리해서 가져온 인증글 목록을 dto 로 만들기
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserTreeDetailResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 나의 히스토리 목록 보기 ( 최신순 )
+     * **/
+    public List<UserHistoryListResponse> getUserHistories(PrincipalUserDetails principalUserDetails, int page, int size) {
+        // 인증
+        User user = validateUser(principalUserDetails);
+
+        // 나의 히스토리 목록 조회해서 가져오기
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Page<TreePost> treePosts = treePostJpaRepository.findAllByUserId(user.getId(), pageable);
+
+        // 페이징 처리해서 가져온 나의 히스토리 목록을 dto 로 만들기
+        return treePosts
+                .getContent()
+                .stream()
+                .map(treePost -> new UserHistoryListResponse(treePost.getId(), treePost.getImageUrl(), treePost.getContent(), treePost.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 }

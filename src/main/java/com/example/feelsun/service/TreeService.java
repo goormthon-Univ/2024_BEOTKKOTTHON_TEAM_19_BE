@@ -12,6 +12,7 @@ import com.example.feelsun.response.TreeResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,6 +66,25 @@ public class TreeService {
         }
     }
 
+    @Transactional
+    public TreeResponse.UserContinuousPeriod getUserContinuousPeriod(List<TreeResponse.MainTreeList> treeList){
+        List<Integer> continuousperiodlist = new ArrayList<Integer>();
+        for (TreeResponse.MainTreeList tree : treeList) {
+            if (!continuousperiodlist.isEmpty()) {
+                continuousperiodlist.add(tree.getContinuousPeriod());
+            } else {
+                if (continuousperiodlist.getFirst()<tree.getContinuousPeriod()) {
+                    continuousperiodlist.addLast(tree.getContinuousPeriod());
+                    continuousperiodlist.removeFirst();
+                }
+            }
+        }
+        int usercountinousperiod = continuousperiodlist.getFirst();
+        TreeResponse.UserContinuousPeriod response = new TreeResponse.UserContinuousPeriod();
+        response.setUserContinuousPeriod(usercountinousperiod);
+        return response;
+    }
+
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
         TreeResponse.TreeDetail response = new TreeResponse.TreeDetail();
         response.setUserId(tree.getUser().getId());
@@ -102,6 +122,8 @@ public class TreeService {
         response.setHabitName(tree.getName());
         response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
+        response.setContinuousPeriod(tree.getContinuousPeriod());
+
         return response;
     }
 

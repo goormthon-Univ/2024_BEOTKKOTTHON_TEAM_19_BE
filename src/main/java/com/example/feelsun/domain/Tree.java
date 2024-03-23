@@ -37,6 +37,9 @@ public class Tree {
     @Column(nullable = false)
     private int price;
 
+    @Column(nullable = false)
+    private boolean certification;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TreeEnum accessLevel;
@@ -51,6 +54,9 @@ public class Tree {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, updatable = false)
+    private Integer continuousPeriod;
+
     @Builder
     public Tree(String name, User user) {
         this.name = name;
@@ -63,7 +69,8 @@ public class Tree {
         this.startDate = LocalDateTime.now();
         this.endDate = this.startDate.plusDays(60);
         this.createdAt = LocalDateTime.now();
+        this.continuousPeriod = 0;
+        this.certification = false;
     }
-
 
 }

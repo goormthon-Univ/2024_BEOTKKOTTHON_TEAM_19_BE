@@ -28,6 +28,16 @@ public class TreeController {
         this.principalUserLoader = principalUserLoader;
     }
 
+    @Operation(summary = "홈 화면", description = "로그인한 유저의 나무 리스트를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "홈 화면 출력 완료",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
+    @GetMapping("/")
+    public ResponseEntity<?> treeList() {
+        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
+    }
+
     @Operation(summary = "나의 나무 상세 정보", description = "로그인한 유저의 나무 상세 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "유저의 나무 랜덤 리스트 조회 성공",
             content = @Content(mediaType = "application/json",
@@ -39,16 +49,6 @@ public class TreeController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeDetailsDTO));
     }
 
-    @Operation(summary = "홈 화면", description = "로그인한 유저의 나무 리스트를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "홈 화면 출력 완료",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
-    @GetMapping("/")
-    public ResponseEntity<?> treeList() {
-        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
-    }
-
     @PostMapping("/create")
     @ApiResponse(responseCode = "200", description = "습관 만들기 성공",
             content = @Content(mediaType = "application/json",
@@ -57,6 +57,16 @@ public class TreeController {
         User user = principalUserLoader.getRequestUser();
         treeService.createTree(requestDTO, user);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(requestDTO));
+    }
+
+    @PostMapping("/continuousperiod")
+    @ApiResponse(responseCode = "200", description = "최장 연속 성장기간입니다.",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
+    public ResponseEntity<?> UserContinuousPeriod() {
+        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
+        TreeResponse.UserContinuousPeriod UserContinuousPeriodDTO = treeService.getUserContinuousPeriod(treeListDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(UserContinuousPeriodDTO));
     }
 
     @DeleteMapping("/delete/{treeId}")
