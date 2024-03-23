@@ -154,7 +154,7 @@ public class UserService {
         return trees
                 .getContent()
                 .stream()
-                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
+                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getUser().getNickname(), tree.getImageUrl()))
                 .toList();
 
     }

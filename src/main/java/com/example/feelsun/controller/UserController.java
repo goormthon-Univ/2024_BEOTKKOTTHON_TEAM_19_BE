@@ -88,7 +88,7 @@ public class UserController {
         List<UserTreeListResponse> treeListDTO = userService.getUserTreeList(principalUserDetails, page, size);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
     }
-    
+
     @Operation(summary = "유저의 히스토리 인증글 목록 조회", description = "유저의 히스토리 인증글 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "인증글 목록 조회 성공",
             content = @Content(mediaType = "application/json",
