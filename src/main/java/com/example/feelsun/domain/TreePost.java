@@ -34,12 +34,11 @@ public class TreePost {
     private LocalDateTime createdAt;
 
     @Builder
-    public TreePost(User user, Tree tree, String content, String imageUrl) {
-        this.user = user;
+    public TreePost(Tree tree, User user, String content, String imageUrl) {
         this.tree = tree;
+        this.user = user;
         this.content = content;
         this.imageUrl = imageUrl;
-        this.createdAt = LocalDateTime.now();
     }
 
 }

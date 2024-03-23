@@ -78,6 +78,12 @@ public class RedisService {
     }
 
     @Transactional
+    public void deleteExcludedIds(String userId) {
+        String key = "excludedIds:" + userId;
+        redisTemplate.delete(key);
+    }
+
+    @Transactional
     public Set<Integer> getExcludedIds(String userId) {
         String key = "excludedIds:" + userId;
         Set<Object> excludedIdObjects = redisTemplate.opsForSet().members(key);

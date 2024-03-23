@@ -8,9 +8,10 @@ public class TreePostRequest {
     @Getter
     @Setter
     public static class TreePostCreateRequest {
-        @NotNull(message = "내용을 입력해주세요.")
+        @NotNull(message = "습관 일지 내용은 필수 입력 값입니다.")
         private String content;
-        @NotNull(message = "사진은 필수입니다.")
+
+        @NotNull(message = "습관 일지 이미지는 필수 입력 값입니다.")
         private String imageUrl;
     }
 }
