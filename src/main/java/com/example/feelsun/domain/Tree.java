@@ -57,9 +57,9 @@ public class Tree {
     public Tree(String name, User user) {
         this.name = name;
         this.user = user;
-        this.level = 1;
-        this.imageUrl = "https://via.placeholder.com/150";
-        this.experience = 1;
+        this.level = 0;
+        this.imageUrl = "https://team19-bucket.s3.ap-northeast-2.amazonaws.com/4cb50b61-d7fb-44c0-a087-ed905a6ffe93.png";
+        this.experience = 0;
         this.price = 0;
         this.accessLevel = TreeEnum.FREE;
         this.createdAt = LocalDateTime.now();
@@ -77,10 +77,10 @@ public class Tree {
     @Transactional
     public void upgradeTree(List<TreeImage> treeImages) {
         // 경험치 기준값을 배열로 선언
-        int[] experienceThresholds = new int[]{1, 2, 10, 30, 50, 70, 100};
+        int[] experienceThresholds = new int[]{0, 1, 2, 10, 30, 50, 70, 100};
 
         // 현재 경험치에 맞는 레벨 찾기
-        for (int i = 0; i < experienceThresholds.length; i++) {
+        for (int i = 1; i < experienceThresholds.length; i++) {
             if (this.experience == experienceThresholds[i]) {
                 // 레벨 업그레이드 및 이미지 URL 업데이트
                 this.level = i; // 경험치에 따른 레벨 설정
