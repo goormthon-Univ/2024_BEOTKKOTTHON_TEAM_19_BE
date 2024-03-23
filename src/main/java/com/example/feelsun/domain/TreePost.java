@@ -1,6 +1,7 @@
 package com.example.feelsun.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,5 +32,13 @@ public class TreePost {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public TreePost(Tree tree, User user, String content, String imageUrl) {
+        this.tree = tree;
+        this.user = user;
+        this.content = content;
+        this.imageUrl = imageUrl;
+    }
 
 }
