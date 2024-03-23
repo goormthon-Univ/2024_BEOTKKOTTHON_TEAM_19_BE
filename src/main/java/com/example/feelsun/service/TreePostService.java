@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional
@@ -26,6 +27,14 @@ public class TreePostService {
     private final UserJpaRepository userJpaRepository;
     private final TreeJpaRepository treeJpaRepository;
     private final TreePostJpaRepository treePostJpaRepository;
+
+    @Transactional
+    public Integer userTreePostAll(PrincipalUserDetails principalUserDetails) {
+        User user = principalUserDetails.getUser();
+        List<TreePost> treePosts = treePostJpaRepository.findAllTreePostByUserId(user);
+        Integer userAllTreePost = treePosts.size();
+        return userAllTreePost;
+    }
 
     @Transactional
     public String uploadTreePostImage(MultipartFile file, PrincipalUserDetails principalUserDetails) throws IOException {
