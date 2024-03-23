@@ -62,6 +62,17 @@ public class TreePostService {
             throw new Exception401("인증되지 않은 사용자입니다.");
         }
 
+        // 오늘 날짜의 시작 시간과 종료 시간을 계산
+        LocalDateTime startOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime startOfNextDay = startOfToday.plusDays(1);
+
+        // 수정된 메서드를 호출
+        int todayCount = treePostJpaRepository.countByTreeIdAndCreatedAt(treeId, startOfToday, startOfNextDay);
+
+        if (todayCount >= 3) {
+            throw new Exception401("하루에 인증글은 3개까지만 작성할 수 있습니다.");
+        }
+
         // 게시물 생성
         TreePost treePost = TreePost.builder()
                 .user(user)
