@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,7 +40,7 @@ public class Tree {
     private int price;
 
     @Column(nullable = false)
-    private boolean certification;
+    private boolean certification = false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -65,4 +67,26 @@ public class Tree {
         this.certification = false;
     }
 
+    @Transactional
+    public void updateExperience(int experience) {
+        this.experience += experience;
+        this.certification = true;
+        this.continuousPeriod += experience;
+    }
+
+    @Transactional
+    public void upgradeTree(List<TreeImage> treeImages) {
+        // 경험치 기준값을 배열로 선언
+        int[] experienceThresholds = new int[]{1, 2, 10, 30, 50, 70, 100};
+
+        // 현재 경험치에 맞는 레벨 찾기
+        for (int i = 0; i < experienceThresholds.length; i++) {
+            if (this.experience == experienceThresholds[i]) {
+                // 레벨 업그레이드 및 이미지 URL 업데이트
+                this.level = i + 1; // 경험치에 따른 레벨 설정
+                this.imageUrl = treeImages.get(this.level).getTreeImageUrl();
+                break; // 적합한 레벨을 찾았으므로 반복 종료
+            }
+        }
+    }
 }

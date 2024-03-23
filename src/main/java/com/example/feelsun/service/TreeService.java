@@ -136,6 +136,7 @@ public class TreeService {
         response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
         response.setContinuousPeriod(tree.getContinuousPeriod());
+        response.setCertification(tree.isCertification());
 
         return response;
     }
