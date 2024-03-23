@@ -88,20 +88,7 @@ public class UserController {
         List<UserTreeListResponse> treeListDTO = userService.getUserTreeList(principalUserDetails, page, size);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
     }
-
-    @Operation(summary = "둘러보기 페이지에서 나무를 클릭했을 때 나오는 인증글 목록 조회", description = "둘러보기 페이지에서 나무를 클릭했을 때 나오는 인증글 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "인증글 목록 조회 성공",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = UserTreeDetailResponse.class)))
-    @GetMapping("/trees/{treeId}")
-    public ResponseEntity<?> getUserTree(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
-                                         @PathVariable("treeId") Integer treeId,
-                                         @RequestParam(value = "page", defaultValue = "0") int page,
-                                         @RequestParam(value = "size", defaultValue = "5") int size) {
-        List<UserTreeDetailResponse> treeDTO = userService.getUserTreeDetail(principalUserDetails, treeId, page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeDTO));
-    }
-
+    
     @Operation(summary = "유저의 히스토리 인증글 목록 조회", description = "유저의 히스토리 인증글 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "인증글 목록 조회 성공",
             content = @Content(mediaType = "application/json",
