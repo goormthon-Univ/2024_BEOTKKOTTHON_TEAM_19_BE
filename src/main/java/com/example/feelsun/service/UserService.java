@@ -233,9 +233,6 @@ public class UserService {
         // 인증
         User user = validateUser(principalUserDetails);
 
-        // redis 에 존재하는 자신의 나무 id 목록 지우기
-        redisService.deleteExcludedIds(String.valueOf(user.getId()));
-
         // 나의 히스토리 목록 조회해서 가져오기
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
@@ -267,5 +264,11 @@ public class UserService {
 
         return new UserShareResponse(user.getNickname(), userShareTreeResponses);
 
+    }
+
+    @Transactional
+    public void deleteKeys(PrincipalUserDetails principalUserDetails) {
+        // redis 에 존재하는 자신의 나무 id 목록 지우기
+        redisService.deleteExcludedIds(String.valueOf(principalUserDetails.getUser().getId()));
     }
 }
