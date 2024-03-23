@@ -33,6 +33,17 @@ public class S3UploadService {
         return fileUrls;
     }
 
+    public String uploadSingleFile(MultipartFile multipartFile) throws IOException {
+        String fileUrl = "";
+
+        if (!multipartFile.isEmpty()) {
+            fileUrl = saveFile(multipartFile);
+        }
+
+        return fileUrl;
+    }
+
+
     public String saveFile(MultipartFile multipartFile) throws IOException {
         String originalFilename = multipartFile.getOriginalFilename();
         // 확장자를 얻기 위해 파일 이름을 "." 기준으로 분리하기
