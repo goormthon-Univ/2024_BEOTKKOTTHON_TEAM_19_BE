@@ -95,7 +95,7 @@ public class TreeService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 0ㅎ * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void resetPlus() {
         treeRepository.updateBooleanFieldForAllTrees(false);
         treeRepository.updateDeadlineIfConditionIsMet();
