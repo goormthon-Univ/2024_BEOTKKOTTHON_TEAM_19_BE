@@ -83,7 +83,7 @@ public class Tree {
         for (int i = 0; i < experienceThresholds.length; i++) {
             if (this.experience == experienceThresholds[i]) {
                 // 레벨 업그레이드 및 이미지 URL 업데이트
-                this.level = i + 1; // 경험치에 따른 레벨 설정
+                this.level = i; // 경험치에 따른 레벨 설정
                 this.imageUrl = treeImages.get(this.level).getTreeImageUrl();
                 break; // 적합한 레벨을 찾았으므로 반복 종료
             }
