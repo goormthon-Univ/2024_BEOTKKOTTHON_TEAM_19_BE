@@ -51,6 +51,12 @@ public class Tree {
     @Column(nullable = false)
     private Integer continuousPeriod;
 
+    @Column(nullable = false)
+    private Integer deadline;
+
+    @Column(nullable = false)
+    private boolean dead;
+
     @Builder
     public Tree(String name, User user) {
         this.name = name;
@@ -63,6 +69,8 @@ public class Tree {
         this.createdAt = LocalDateTime.now();
         this.continuousPeriod = 0;
         this.certification = false;
+        this.deadline = 0;
+        this.dead = false;
     }
 
 }
