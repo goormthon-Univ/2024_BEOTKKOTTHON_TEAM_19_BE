@@ -1,5 +1,6 @@
 package com.example.feelsun.service;
 
+import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.auth.PrincipalUserLoader;
 import com.example.feelsun.config.errors.exception.Exception404;
 import com.example.feelsun.domain.Tree;
@@ -34,9 +35,8 @@ public class TreeService {
     }
 
     @Transactional(readOnly = true)
-    public List<TreeResponse.MainTreeList> treeList() {
-        User user = getUserFromPrincipal();
-        List<Tree> trees = treeRepository.findByUser(user);
+    public List<TreeResponse.MainTreeList> treeList(PrincipalUserDetails principalUserDetails) {
+        List<Tree> trees = treeRepository.findByUser(principalUserDetails.getUser());
 
         if (trees.isEmpty()) {
             throw new Exception404("생성한 나무가 없습니다.");
