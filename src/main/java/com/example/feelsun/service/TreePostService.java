@@ -36,6 +36,7 @@ public class TreePostService {
         return s3UploadService.uploadSingleFile(file);
     }
 
+    @Transactional
     public void createTreePost(TreePostRequest.TreePostCreateRequest requestDTO, Integer treeId, PrincipalUserDetails principalUserDetails) {
         // 인증
         User user = validateUser(principalUserDetails);
