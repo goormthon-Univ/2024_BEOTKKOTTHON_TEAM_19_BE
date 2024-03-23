@@ -109,13 +109,15 @@ public class UserResponse {
         private String nickname;
         private boolean feedback;
         private Integer treeId;
+        private List<String> treePostImageUrls;
 
-        public UserLoginResponse(Integer id, String username, String nickname, Integer treeId, Boolean feedback) {
+        public UserLoginResponse(Integer id, String username, String nickname, Integer treeId, Boolean feedback, List<String> treePostImageUrls) {
             this.id = id;
             this.username = username;
             this.nickname = nickname;
             this.treeId = treeId;
             this.feedback = feedback;
+            this.treePostImageUrls = treePostImageUrls;
         }
     }
 }

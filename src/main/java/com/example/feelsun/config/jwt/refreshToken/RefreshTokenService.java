@@ -4,18 +4,23 @@ package com.example.feelsun.config.jwt.refreshToken;
 import com.example.feelsun.config.errors.exception.Exception401;
 import com.example.feelsun.config.jwt.JwtProvider;
 import com.example.feelsun.domain.Tree;
+import com.example.feelsun.domain.TreePost;
 import com.example.feelsun.domain.User;
 import com.example.feelsun.repository.TreeJpaRepository;
+import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.AuthRequest;
 import com.example.feelsun.response.UserResponse.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Transactional
 @Service
 public class RefreshTokenService {
@@ -24,13 +29,7 @@ public class RefreshTokenService {
     private final JwtProvider jwtProvider;
     private final UserJpaRepository userJpaRepository;
     private final TreeJpaRepository treeJpaRepository;
-
-    public RefreshTokenService(RedisTemplate<String, Object> redisTemplate, JwtProvider jwtProvider, UserJpaRepository userJpaRepository, TreeJpaRepository treeJpaRepository) {
-        this.redisTemplate = redisTemplate;
-        this.jwtProvider = jwtProvider;
-        this.userJpaRepository = userJpaRepository;
-        this.treeJpaRepository = treeJpaRepository;
-    }
+    private final TreePostJpaRepository treePostJpaRepository;
 
     // 리프래쉬 토큰 저장
     @Transactional
@@ -65,15 +64,29 @@ public class RefreshTokenService {
         String newAccessToken = jwtProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         List<Tree> deadTrees;
+
         deadTrees = treeJpaRepository.selectDeadTree(user);
+
         boolean feedback = false;
+
         Integer deadtree = 0;
+
+        List<String> treePostImageUrls = new ArrayList<>();
+
         if(!deadTrees.isEmpty()){
             feedback = true;
+
             deadtree = deadTrees.get(0).getId();
+
+            List<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(deadtree);
+
+            for (TreePost treePost : treePosts) {
+                treePostImageUrls.add(treePost.getImageUrl());
+            }
+
         }
 
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback, treePostImageUrls);
 
         return new UserLoginResponseWithToken(loginResponseDTO, newAccessToken, refreshToken);
     }
