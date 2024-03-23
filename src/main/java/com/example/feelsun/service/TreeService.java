@@ -57,6 +57,11 @@ public class TreeService {
     }
 
     @Transactional
+    public void updateTree(TreeRequest.TreeCreateRequest requestDTO, Integer treeId) {
+        treeRepository.treeUpdateName(requestDTO.getName(), treeId);
+    }
+
+    @Transactional
     public void deleteTree(Integer treeId) {
         treeRepository.deleteById(treeId);
     }

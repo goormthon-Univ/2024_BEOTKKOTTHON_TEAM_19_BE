@@ -43,7 +43,6 @@ public class TreeController {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
     @GetMapping("/{treeId}")
-
     public ResponseEntity<?> treeDetail(@PathVariable("treeId") Integer treeId) {
         TreeResponse.TreeDetail treeDetailsDTO = treeService.getTreeDetails(treeId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeDetailsDTO));
@@ -67,6 +66,15 @@ public class TreeController {
         List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
         TreeResponse.UserContinuousPeriod UserContinuousPeriodDTO = treeService.getUserContinuousPeriod(treeListDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(UserContinuousPeriodDTO));
+    }
+
+    @PutMapping("/{treeId}")
+    @ApiResponse(responseCode = "200", description = "습관 수정입니다.",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
+    public ResponseEntity<?> updateTree(TreeRequest.TreeCreateRequest requestDTO, @PathVariable("treeId") Integer treeId) {
+        treeService.updateTree(requestDTO, treeId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(requestDTO));
     }
 
     @DeleteMapping("/delete/{treeId}")
