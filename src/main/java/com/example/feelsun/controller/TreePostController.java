@@ -3,6 +3,7 @@ package com.example.feelsun.controller;
 import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.request.TreePostRequest.*;
+import com.example.feelsun.response.TreePostResponse.*;
 import com.example.feelsun.response.UserResponse.*;
 import com.example.feelsun.service.TreePostService;
 import com.example.feelsun.service.UserService;
@@ -61,13 +62,15 @@ public class TreePostController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
     }
 
-    @Operation(summary = "나무 전체 인증글 수를 가져옵니다", description = "나무 전체 인증글 수를 가져옵니다")
-    @ApiResponse(responseCode = "200", description = "나무 전체 인증글 수를 가져옵니다")
+    @Operation(summary = "나무 전체 인증글 수 및 오늘 인증글 수를 가져옵니다", description = "나무 전체 인증글 수 및 오늘 인증글 수를 가져옵니다")
+    @ApiResponse(responseCode = "200", description = "나무 전체 인증글 수 및 오늘 인증글 수를 가져옵니다",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TreePostCountResponse.class)))
     @GetMapping("/{treeId}/post-counts")
     public ResponseEntity<?> getTreePostCounts(@PathVariable("treeId") Integer treeId,
                                                @AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
-        int count = treePostService.getTreePostCounts(treeId, principalUserDetails);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(count));
+        TreePostCountResponse countDTO = treePostService.getTreePostCounts(treeId, principalUserDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(countDTO));
     }
 
 }
