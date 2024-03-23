@@ -34,7 +34,7 @@ public class TreeController {
     @ApiResponse(responseCode = "200", description = "홈 화면 출력 완료",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> treeList(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
         List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList(principalUserDetails);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
