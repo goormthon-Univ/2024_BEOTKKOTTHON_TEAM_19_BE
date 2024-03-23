@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,15 +79,27 @@ public class UserService {
         refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
 
         List<Tree> deadTrees;
+
         deadTrees = treeJpaRepository.selectDeadTree(user);
+
         boolean feedback = false;
+
         Integer deadtree = 0;
+
+        List<String> treePostImageUrls = new ArrayList<>();
+
         if(!deadTrees.isEmpty()){
             feedback = true;
             deadtree = deadTrees.get(0).getId();
+
+            List<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(deadtree);
+
+            for (TreePost treePost : treePosts) {
+                treePostImageUrls.add(treePost.getImageUrl());
+            }
         }
 
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback, treePostImageUrls);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
@@ -115,12 +128,24 @@ public class UserService {
         deadTrees = treeJpaRepository.selectDeadTree(user);
 
         boolean feedback = false;
+
         Integer deadtree = 0;
+
+        List<String> treePostImageUrls = new ArrayList<>();
+
         if(!deadTrees.isEmpty()){
             feedback = true;
+
             deadtree = deadTrees.get(0).getId();
+
+            List<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(deadtree);
+
+            for (TreePost treePost : treePosts) {
+                treePostImageUrls.add(treePost.getImageUrl());
+            }
         }
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
+
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback, treePostImageUrls);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }

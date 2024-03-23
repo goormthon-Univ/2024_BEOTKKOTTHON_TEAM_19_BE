@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface TreePostJpaRepository extends JpaRepository<TreePost, Integer> {
     Page<TreePost> findAllByTreeId(Integer treeId, Pageable pageable);
@@ -18,4 +19,5 @@ public interface TreePostJpaRepository extends JpaRepository<TreePost, Integer> 
     @Query("SELECT COUNT(tp) FROM TreePost tp WHERE tp.tree.id = :treeId AND tp.createdAt >= :startDate AND tp.createdAt < :endDate")
     int countByTreeIdAndCreatedAt(Integer treeId, LocalDateTime startDate, LocalDateTime endDate);
 
+    List<TreePost> findAllByTreeId(Integer deadtree);
 }
