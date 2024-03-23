@@ -70,14 +70,13 @@ public class TreeController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(UserContinuousPeriodDTO));
     }
 
-    @PutMapping("/{treeId}")
-    @ApiResponse(responseCode = "200", description = "습관 수정입니다.",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
-    public ResponseEntity<?> updateTree(TreeRequest.TreeCreateRequest requestDTO, @PathVariable("treeId") Integer treeId) {
-        treeService.updateTree(requestDTO, treeId);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(requestDTO));
-    }
+    @PatchMapping("/{treeId}")
+    public ResponseEntity<?> updateTreeName(
+            @PathVariable Integer treeId,
+            @AuthenticationPrincipal PrincipalUserDetails principalUserDetails,
+            @RequestBody @Valid TreeRequest.TreeCreateRequest requestDTO) {
+        treeService.updateTreeName(treeId, requestDTO, principalUserDetails);
+
 
     @DeleteMapping("/delete/{treeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

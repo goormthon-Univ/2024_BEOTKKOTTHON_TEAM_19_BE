@@ -89,6 +89,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
     }
 
+    @Operation(summary = "redis 안에 저장된 키 삭제", description = "redis 안에 저장된 키를 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "키 삭제 성공")
+    @DeleteMapping("/redis-keys")
+    public ResponseEntity<?> deleteKeys(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
+        userService.deleteKeys(principalUserDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.successWithNoContent());
+    }
+
     @Operation(summary = "유저의 히스토리 인증글 목록 조회", description = "유저의 히스토리 인증글 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "인증글 목록 조회 성공",
             content = @Content(mediaType = "application/json",
