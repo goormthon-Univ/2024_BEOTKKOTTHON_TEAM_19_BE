@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class UserService {
             throw new Exception400(null, "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        String accessToken = JwtProvider.TOKEN_PREFIX + tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+        String accessToken = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         // 리프래쉬 토큰 생성
         String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
@@ -78,15 +79,27 @@ public class UserService {
         refreshTokenService.saveRefreshToken(user.getId().toString(), refreshToken);
 
         List<Tree> deadTrees;
+
         deadTrees = treeJpaRepository.selectDeadTree(user);
+
         boolean feedback = false;
+
         Integer deadtree = 0;
+
+        List<String> treePostImageUrls = new ArrayList<>();
+
         if(!deadTrees.isEmpty()){
             feedback = true;
             deadtree = deadTrees.get(0).getId();
+
+            List<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(deadtree);
+
+            for (TreePost treePost : treePosts) {
+                treePostImageUrls.add(treePost.getImageUrl());
+            }
         }
 
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback, treePostImageUrls);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
@@ -104,7 +117,7 @@ public class UserService {
         User user = userJpaRepository.findByUsername(requestDTO.getUsername())
                 .orElseThrow(() -> new Exception400(null, "회원가입에 실패했습니다."));
 
-        String accessToken = JwtProvider.TOKEN_PREFIX + tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
+        String accessToken = tokenProvider.createToken(user.getId().toString(), user.getRole().toString(), user.getNickname());
 
         // 리프래쉬 토큰 생성
         String refreshToken = tokenProvider.createRefreshToken(user.getId().toString());
@@ -115,12 +128,24 @@ public class UserService {
         deadTrees = treeJpaRepository.selectDeadTree(user);
 
         boolean feedback = false;
+
         Integer deadtree = 0;
+
+        List<String> treePostImageUrls = new ArrayList<>();
+
         if(!deadTrees.isEmpty()){
             feedback = true;
+
             deadtree = deadTrees.get(0).getId();
+
+            List<TreePost> treePosts = treePostJpaRepository.findAllByTreeId(deadtree);
+
+            for (TreePost treePost : treePosts) {
+                treePostImageUrls.add(treePost.getImageUrl());
+            }
         }
-        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback);
+
+        UserLoginResponse loginResponseDTO = new UserLoginResponse(user.getId(), user.getUsername(), user.getNickname(), deadtree, feedback, treePostImageUrls);
 
         return new UserLoginResponseWithToken(loginResponseDTO, accessToken, refreshToken);
     }
@@ -131,6 +156,18 @@ public class UserService {
     public List<UserTreeListResponse> getUserTreeList(PrincipalUserDetails principalUserDetails, int page, int size) {
         // 인증
         User user = validateUser(principalUserDetails);
+
+        // 자기자신의 나무는 보이지 않도록 redis 에 저장
+        List<Tree> myTrees = treeJpaRepository.findAllByUserId(user.getId());
+
+        Set<Integer> myTreeIds = myTrees
+                .stream()
+                .map(Tree::getId)
+                .collect(Collectors.toSet());
+
+        if (!myTreeIds.isEmpty()) {
+            redisService.addExcludedIds(String.valueOf(user.getId()), myTreeIds);
+        }
 
         // redis 에 저장해둔 나무 정보 리스트 가져오기
         Set<Integer> excludedIds = redisService.getExcludedIds(String.valueOf(user.getId()));
@@ -159,7 +196,7 @@ public class UserService {
         return trees
                 .getContent()
                 .stream()
-                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getName(), tree.getImageUrl()))
+                .map(tree -> new UserTreeListResponse(tree.getUser().getId(), tree.getId(), tree.getUser().getNickname(), tree.getImageUrl()))
                 .toList();
 
     }

@@ -1,5 +1,6 @@
 package com.example.feelsun.controller;
 
+import com.example.feelsun.config.auth.PrincipalUserDetails;
 import com.example.feelsun.config.auth.PrincipalUserLoader;
 import com.example.feelsun.config.utils.ApiResponseBuilder;
 import com.example.feelsun.domain.User;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +34,9 @@ public class TreeController {
     @ApiResponse(responseCode = "200", description = "홈 화면 출력 완료",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
-    @GetMapping("/")
-    public ResponseEntity<?> treeList() {
-        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
+    @GetMapping("")
+    public ResponseEntity<?> treeList(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
+        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList(principalUserDetails);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(treeListDTO));
     }
 
@@ -62,8 +64,8 @@ public class TreeController {
     @ApiResponse(responseCode = "200", description = "최장 연속 성장기간입니다.",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TreeResponse.MainTreeList.class)))
-    public ResponseEntity<?> UserContinuousPeriod() {
-        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList();
+    public ResponseEntity<?> UserContinuousPeriod(@AuthenticationPrincipal PrincipalUserDetails principalUserDetails) {
+        List<TreeResponse.MainTreeList> treeListDTO = treeService.treeList(principalUserDetails);
         TreeResponse.UserContinuousPeriod UserContinuousPeriodDTO = treeService.getUserContinuousPeriod(treeListDTO);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseBuilder.success(UserContinuousPeriodDTO));
     }

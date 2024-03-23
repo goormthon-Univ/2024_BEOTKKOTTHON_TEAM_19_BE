@@ -72,13 +72,13 @@ public class UserResponse {
     public static class UserTreeListResponse {
         private Integer userId;
         private Integer treeId;
-        private String habitName;
+        private String nickname;
         private String treeImageUrl;
 
-        public UserTreeListResponse(Integer userId, Integer treeId, String habitName, String treeImageUrl) {
+        public UserTreeListResponse(Integer userId, Integer treeId, String nickname, String treeImageUrl) {
             this.userId = userId;
             this.treeId = treeId;
-            this.habitName = habitName;
+            this.nickname = nickname;
             this.treeImageUrl = treeImageUrl;
         }
 
@@ -109,13 +109,15 @@ public class UserResponse {
         private String nickname;
         private boolean feedback;
         private Integer treeId;
+        private List<String> treePostImageUrls;
 
-        public UserLoginResponse(Integer id, String username, String nickname, Integer treeId, Boolean feedback) {
+        public UserLoginResponse(Integer id, String username, String nickname, Integer treeId, Boolean feedback, List<String> treePostImageUrls) {
             this.id = id;
             this.username = username;
             this.nickname = nickname;
             this.treeId = treeId;
             this.feedback = feedback;
+            this.treePostImageUrls = treePostImageUrls;
         }
     }
 }
