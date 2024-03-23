@@ -37,6 +37,11 @@ public class TreeService {
     public List<TreeResponse.MainTreeList> treeList() {
         User user = getUserFromPrincipal();
         List<Tree> trees = treeRepository.findByUser(user);
+
+        if (trees.isEmpty()) {
+            throw new Exception404("생성한 나무가 없습니다.");
+        }
+
         return trees.stream()
                 .map(this::mapToTreeResponse)
                 .collect(Collectors.toList());
@@ -70,6 +75,7 @@ public class TreeService {
     @Transactional
     public TreeResponse.UserContinuousPeriod getUserContinuousPeriod(List<TreeResponse.MainTreeList> treeList){
         List<Integer> continuousperiodlist = new ArrayList<Integer>();
+        if (treeList.isEmpty()) new Exception404("생성한 나무가 없습니다.");
         for (TreeResponse.MainTreeList tree : treeList) {
             if (continuousperiodlist.isEmpty()) {
                 continuousperiodlist.add(tree.getContinuousPeriod());

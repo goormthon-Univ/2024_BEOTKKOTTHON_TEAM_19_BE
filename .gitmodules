@@ -1,3 +1,6 @@
 [submodule "2024_BEOTKKOTTHON_TEAM_19_BE_YML"]
 	path = 2024_BEOTKKOTTHON_TEAM_19_BE_YML
 	url = https://github.com/goormthon-Univ/2024_BEOTKKOTTHON_TEAM_19_BE_YML.git
+[submodule "private"]
+	path = private
+	url = https://github.com/goormthon-Univ/2024_BEOTKKOTTHON_TEAM_19_BE_YML.git

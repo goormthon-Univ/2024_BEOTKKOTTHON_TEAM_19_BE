@@ -7,9 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 public class FeelsunApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(FeelsunApplication.class, args);
-	}
+	public static void main(String[] args) {SpringApplication.run(FeelsunApplication.class, args);}
 
 }
