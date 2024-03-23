@@ -93,6 +93,7 @@ public class UserResponse {
         private String accessToken;
         private String refreshToken;
 
+
         public UserLoginResponseWithToken(UserLoginResponse loginResponseDTO, String accessToken, String refreshToken) {
             this.loginResponseDTO = loginResponseDTO;
             this.accessToken = accessToken;
@@ -106,11 +107,15 @@ public class UserResponse {
         private Integer id;
         private String username;
         private String nickname;
+        private boolean feedback;
+        private Integer treeId;
 
-        public UserLoginResponse(Integer id, String username, String nickname) {
+        public UserLoginResponse(Integer id, String username, String nickname, Integer treeId, Boolean feedback) {
             this.id = id;
             this.username = username;
             this.nickname = nickname;
+            this.treeId = treeId;
+            this.feedback = feedback;
         }
     }
 }

@@ -35,4 +35,7 @@ public interface TreeJpaRepository extends JpaRepository<Tree, Integer> {
     void updateDeadBooleanForAllTrees();
     List<Tree> findAllByUserId(Integer userId);
 
+    @Transactional
+    @Query("SELECT t FROM Tree t WHERE t.dead = true and t.user = :newUser")
+    List<Tree> selectDeadTree(@Param("newValue") User newUser);
 }
