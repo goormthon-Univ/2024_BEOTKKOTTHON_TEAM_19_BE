@@ -17,6 +17,8 @@ public class TreeResponse {
         private String habitName;
         private String treeImageUrl;
         private String imageUrl;
+        private Integer continuousPeriod;
+        private boolean certification;
     }
 
     @Getter
@@ -32,8 +34,13 @@ public class TreeResponse {
         private String imageUrl;
         private int price;
         private TreeEnum accessLevel;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
         private LocalDateTime createdAt;
     }
+    @Getter
+    @Setter
+    public static class UserContinuousPeriod {
+        private Integer userId;
+        private Integer userContinuousPeriod;
+    }
+
 }

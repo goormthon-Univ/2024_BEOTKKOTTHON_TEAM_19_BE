@@ -9,9 +9,11 @@ import com.example.feelsun.repository.TreePostJpaRepository;
 import com.example.feelsun.repository.UserJpaRepository;
 import com.example.feelsun.request.TreeRequest;
 import com.example.feelsun.response.TreeResponse;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +37,11 @@ public class TreeService {
     public List<TreeResponse.MainTreeList> treeList() {
         User user = getUserFromPrincipal();
         List<Tree> trees = treeRepository.findByUser(user);
+
+        if (trees.isEmpty()) {
+            throw new Exception404("생성한 나무가 없습니다.");
+        }
+
         return trees.stream()
                 .map(this::mapToTreeResponse)
                 .collect(Collectors.toList());
@@ -65,6 +72,34 @@ public class TreeService {
         }
     }
 
+    @Transactional
+    public TreeResponse.UserContinuousPeriod getUserContinuousPeriod(List<TreeResponse.MainTreeList> treeList){
+        List<Integer> continuousperiodlist = new ArrayList<Integer>();
+        if (treeList.isEmpty()) new Exception404("생성한 나무가 없습니다.");
+        for (TreeResponse.MainTreeList tree : treeList) {
+            if (continuousperiodlist.isEmpty()) {
+                continuousperiodlist.add(tree.getContinuousPeriod());
+            } else {
+                if (continuousperiodlist.get(0) < tree.getContinuousPeriod()) {
+                    continuousperiodlist.add(tree.getContinuousPeriod());
+                    continuousperiodlist.remove(0);
+                }
+            }
+        }
+
+        int usercountinousperiod = continuousperiodlist.get(0);
+        TreeResponse.UserContinuousPeriod response = new TreeResponse.UserContinuousPeriod();
+        response.setUserContinuousPeriod(usercountinousperiod);
+
+        return response;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    public void reset() {
+        treeRepository.updateBooleanFieldForAllTrees(false);
+    }
+
     private TreeResponse.TreeDetail mapToTreeDetatailResponse(Tree tree) {
         TreeResponse.TreeDetail response = new TreeResponse.TreeDetail();
         response.setUserId(tree.getUser().getId());
@@ -74,11 +109,9 @@ public class TreeService {
         response.setExperience(tree.getExperience());
         response.setHabitName(tree.getName());
         response.setTreeImageUrl(tree.getImageUrl());
-        response.setImageUrl(tree.getImageUrl()); // Assuming same URL for both tree image and user image
+        response.setImageUrl(tree.getImageUrl());
         response.setPrice(tree.getPrice());
         response.setAccessLevel(tree.getAccessLevel());
-        response.setStartDate(tree.getStartDate());
-        response.setEndDate(tree.getEndDate());
         response.setCreatedAt(tree.getCreatedAt());
 
         return response;
@@ -102,6 +135,8 @@ public class TreeService {
         response.setHabitName(tree.getName());
         response.setTreeImageUrl(tree.getImageUrl());
         response.setImageUrl(tree.getImageUrl());
+        response.setContinuousPeriod(tree.getContinuousPeriod());
+
         return response;
     }
 
